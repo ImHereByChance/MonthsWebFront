@@ -11,14 +11,14 @@ html {
     overflow-y: hidden;
 }
 
-html, body, #main-container {
+html, body, #_main-container {
     height: 100%;
     width: 100%;
     font-family: arial;
     display: flex;
 }
 
-#main-container {
+#_main-container {
     display: flex;
     align-items: stretch;
     background: cornflowerblue;

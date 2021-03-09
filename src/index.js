@@ -4,9 +4,9 @@ import './styles/main.css'
 console.log('I am entry point')
 
 // Entire app launch initializations.
-const mainContainer = document.getElementById('main-container')
+const _mainContainer = document.getElementById('_main-container')
 
 
 
 window.Widget = Widget
-window.mainContainer = mainContainer
+window._mainContainer = _mainContainer
