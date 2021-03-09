@@ -1,4 +1,12 @@
-import sayHello from './widget'
+import Widget from './widget'
+import './styles/main.css'
 
 console.log('I am entry point')
-sayHello()
+
+// Entire app launch initializations.
+const mainContainer = document.getElementById('main-container')
+
+
+
+window.Widget = Widget
+window.mainContainer = mainContainer
