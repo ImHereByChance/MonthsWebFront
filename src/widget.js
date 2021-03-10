@@ -1,11 +1,11 @@
 /**
-* The base class for widget, entity, that combine simple
+* The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
 * to provide this logic.
 * @param  {Widget} parent  -  where to place this 
 * @param  {object} options={ }  -  options of HTML Element
 */
-export default class Widget {
+class Widget {
     constructor(parent, options={}) {
         this._checkTypes(parent, options)
 
@@ -13,15 +13,12 @@ export default class Widget {
         this.parent = parent
         // HTML Element associated with this class instance 
         this.element = document.createElement(
-            // if tagName of element specified in this.option element,
-            // it will be taken from there, otherwise will be set as <div>
             options.tagName ? options.tagName : 'DIV'
         )
         // HTML Element attributes you may specify before initialization
         this.options = options
         // HTML id attribute (of this.element) and identifier of this class
-        // instance. If tagName of this.element specified is this.options arg,
-        // it will be taken from there, otherwise will it be <div>.
+        // instance.
         this.id = options.id ? options.id : this.makeId('w')
         
         //                          Privates
@@ -34,10 +31,22 @@ export default class Widget {
         // setter to the this.element object and not available any more.
         this._localOptions = options
     }
-     
+    
+    set options(newOptions) {
+        delete newOptions.tagName
+        try {
+            Object.assign(this.element, newOptions)
+        } catch(err) {
+            console.error(`cannot assign given options ${newOptions} to the`
+                          + `HTML element of the Widget`)
+            throw err
+        }
+    }
+
     /**
-     * The alternative constructor, that takes as args parent Widget and raw
-     * html string and returns a new Widget object based on given html string 
+     * The alternative constructor, that takes as args parent `Widget`
+     * and raw html string and returns a new Widget object based on
+     * given html string.
      * @param  {Widget} parent  -  where to place this 
      * @param  {string} rawHTML  -  e.g "<div>example</div>"
      * @returns {Widget} Widget
@@ -62,7 +71,7 @@ export default class Widget {
     }
 
     /**
-     * Places this.element inside the specified parent widget
+     * Places `this.element` inside the specified parent widget
      * (renders it).
      */
     build() {
@@ -77,7 +86,7 @@ export default class Widget {
         }
     }
     /**
-     * Is this.element already on the page?
+     * Is `this.element` already on the page?
      */
     isBuilded(){
         if(document.getElementById(this.id)){
@@ -87,24 +96,12 @@ export default class Widget {
         }
     }
 
-    set options(newOptions) {
-        delete newOptions.tagName
-        try {
-            Object.assign(this.element, newOptions)
-        } catch(err) {
-            console.error(`cannot assign given options ${newOptions} to the`
-                          + `HTML element of the Widget`)
-            throw err
-        }
-    }
-    
     /**
      * Make id for this instance from some random integers and 
      * the character which will be concatenated to this integers
-     * (may use to represent type of this Widget, for example).
-     * 
-     * Usage:
+     * (may use to represent type of this `Widget`, for example).
      * ```
+     * // Usage:
      * > this.makeID('MyWidgetType')
      * 'MyWidgetType14336'
      * 
@@ -119,14 +116,14 @@ export default class Widget {
     }
     
     /**
-     * Removes HTML element of this Widget from the document.
+     * Removes HTML element of this `Widget` from the document.
      * Can be restored via this.build() 
      */
     remove() {
         this.element.remove()
     }
     /**
-     * Set this.element.style.display to 'none' - hides im from the page
+     * Set `this.element.style.display` to 'none' - hides im from the page
      */
     hide() {
         if(this._defaultDisplayMode != 'none'){
@@ -168,7 +165,8 @@ export default class Widget {
     }
     
     /**
-     * Validate args.
+     * Validate args of the class constructor.
+     * 
      * @param  {Widget} parent
      * @param  {object} options
      */
@@ -177,8 +175,10 @@ export default class Widget {
             !(parent instanceof Widget)
             & (parent.id != '_main-container')
         ) {
-            throw new TypeError('first argument (parent) should'
-                                + 'be instance of Widget')
+            throw new TypeError('first argument (parent) should ' +
+                                'be an instance of Widget')
         }
     }
 }
+
+module.exports = {Widget}
