@@ -2,8 +2,8 @@
 * The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
 * to provide this logic.
-* @param  {Widget} parent  -  where to place this 
-* @param  {object} options={ }  -  options of HTML Element
+* @param  {Widget} parent - where to place this 
+* @param  {object} options={ } - options of HTML Element
 */
 class Widget {
     constructor(parent, options={}) {
@@ -85,6 +85,7 @@ class Widget {
             throw(err)
         }
     }
+    
     /**
      * Is `this.element` already on the page?
      */
@@ -122,6 +123,7 @@ class Widget {
     remove() {
         this.element.remove()
     }
+
     /**
      * Set `this.element.style.display` to 'none' - hides im from the page
      */
@@ -180,5 +182,6 @@ class Widget {
         }
     }
 }
+
 
 module.exports = {Widget}

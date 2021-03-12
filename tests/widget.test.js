@@ -26,8 +26,7 @@ test('Widget builded', () => {
     expect(testWidget_2.parent.element).toBe(builded_2.parentNode)
 })
 
-test('Widget raises custom error if wrong "parent" arg was given', () => {
-
+test('Widget raises custom error if invalid "parent" arg was given', () => {
     expect(() => {
         testWidget = new Widget('wrong arg type')
     }).toThrow('first argument (parent) should be an instance of Widget')
@@ -35,11 +34,9 @@ test('Widget raises custom error if wrong "parent" arg was given', () => {
     expect(() => {
         testWidget = new Widget(-1)
     }).toThrow('first argument (parent) should be an instance of Widget')
-
 })
 
 test('Widget removes itself from document', () => {
-
     const testWidget_3 = new Widget(_mainContainer, {
         innerText: 'test', 
         id: 'testWG_3'
@@ -49,5 +46,3 @@ test('Widget removes itself from document', () => {
     testWidget_3.remove()
     expect(document.querySelector('#testWG_3')).toBe(null)
 })
-
-
