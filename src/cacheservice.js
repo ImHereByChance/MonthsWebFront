@@ -1,53 +1,85 @@
 const {copyObject} = require('./copy')
 
+class TaskArray extends Array {
+    checkDailyTasks(checkingDate) {
+        let haveDoneTasks = false
+        for (let task of this) {
+            if (this._equals(
+                [task.date.getDate(), task.date.getMonth()],
+                [checkingDate.getDate(), checkingDate.getMonth()]
+            )) {
+                
+                if (!task.completion) {
+                    return 'got tasks'
+                } else {
+                    haveDoneTasks = true
+                }
+                
+            }
+        }
+        if (haveDoneTasks) {
+            return 'tasks done'
+        } else {
+            return 'no tasks'
+        }
+    }
+
+    /**
+     * Simple function to compare two arrays
+     * @param  {Array} a - first array
+     * @param  {Array} b - second array
+     */
+    _equals(a, b) {
+        return a.length === b.length && a.every((v, i) => v === b[i])
+    }
+
+}
 
 class CacheService {
     constructor(transportService) {
         this.transportService = transportService
         
-        this.currentDate = new Date()
+        this.today = new Date()
         
         this.pageDate = this.currentDate
         
-        this.pageDaysArr = []
+        this.monthDaysArray = []
         
-        this.taskList = []
+        this.taskArray = []
         // Promise, of the data from the server
-        this.readyToRun = this._requestDataPack(this.currentDate)  
+        this.readyToRun = this._requestMonthPack(this.currentDate)  
     }
 
-    // TODO refactor following 3 methods
-    _requestDataPack(date) {
+
+    setDate(newDate) {
+        // also returns promise, that indicates receiving data from server
+        console.log('%c requesting data for changing page date: ' +
+                    `${this.pageDate}`, 'color: cornflowerblue')
+        return this._requestMonthPack(newDate)
+    }
+    
+    _requestMonthPack(date) {
         // returns promise, that should contain the data from the server
         return transportService.getChangeMonthPack(date)
             .then(pack => {
-                this.pageDate = date
-                this.pageDaysArr = pack.monthdates.map(i => new Date(i))
-                this.taskList = pack.tasks
-                console.log('%c requested data successfully received from the server',
-                            'color: yellowgreen')
-                console.log(this.taskList)
+                this.pageDate = toDateField(date)
+                this.monthDaysArray = pack.monthDates.map(d => new Date(d))
+                this.tasksArray = pack.tasksArray
+                
+                console.log('%c requested data successfully received ' + 
+                            'from the server', 'color: yellowgreen')
+                console.log(this.tasksArray)
             })
-    }
-    reqChangeDate(newDate) {
-        // also returns promise, that indicates receiving data from server
-        console.log('%c requesting data for changing page date: ' +
-                    `${this.pageDate}`,
-                    'color: cornflowerblue')
-        return this._requestDataPack(newDate)
             .catch(err => {
-                console.log(`%c Failed to receive data for changing page date: 
-                ${this.pageDate}`,
-                'color: crimson')
+                console.log('%c Failed to receive data for changing ' + 
+                            `page date: ${this.pageDate}`, 'color: crimson')
                 throw err
             })
     }
-    refreshData() {
-        return this.reqChangeDate(this.pageDate)
-    }
 
-    
-    
+
+
+
     createTask(newTask) {
         return this.transportService.addNewTask(newTask)
         .then(() => {
@@ -76,8 +108,8 @@ class CacheService {
         return this.transportService.deleteTask(deletedTask)
         .then(() => {
             console.log('%c the task was successfully deleted from DB', 'color: yellowgreen')
-            let taskIndex = this.taskList.indexOf(deletedTask)
-            this.taskList.splice(taskIndex, 1)
+            let taskIndex = this.tasksArray.indexOf(deletedTask)
+            this.tasksArray.splice(taskIndex, 1)
         })
         .catch(err => {
             console.error('failed to delete the task')
@@ -90,7 +122,7 @@ class CacheService {
         .then(() => {
             console.log('%c information about the task completion was changed on DB', 'color: yellowgreen')
             let unchangedTask
-            for(let task of this.taskList) {
+            for(let task of this.tasksArray) {
                 if(task.id === checkingTask.id && task.date === checkingTask.date) {
                     task.completion = checkingTask.completion
                     break
@@ -109,7 +141,7 @@ class CacheService {
         let dateString = DateFormater.formatForBackend(date)
         let haveDoneTasks = false
         
-        for (let task of this.taskList) {
+        for (let task of this.tasksArray) {
             if (task.date === dateString) {
                 if (!task.completion) {
                     return 'got tasks'
@@ -129,7 +161,7 @@ class CacheService {
         let dateString = DateFormater.formatForBackend(date)
         let dailyTasks = []
         
-        for(let task of this.taskList) {
+        for(let task of this.tasksArray) {
             if (dateString === task.date){
                 dailyTasks.push(task)
             }
@@ -140,11 +172,32 @@ class CacheService {
         throw ('move this method away from this class!') // TODO: fix it!
         return date.getMonth() === this.pageDate.getMonth()
     }
+
+    // deprecated
+    get taskList() {
+        throw 'this property renamed to this.tasksArray'
+    }
+    get pageDaysArr() {
+        throw 'this property renamed to this.monthDaysArray'
+    }
+    _requestDataPack(...args) {
+        throw 'this method renamed to this._requestMonthPack()'
+    }
+    reqChangeDate(...args) {
+        throw 'this method renamed to this.setDate()'
+    }
+    refreshData() {
+        throw "method deprecated - use setDate() instead it"
+    }
+
 }
 
 
-/**Self-validating Object, of the user's task.
- * @param  {} object
+/**Self-validating object of the user's task.
+ * Accepts an object from the server, where fields are parameters of
+ * a user task, checks them, throws an error if the data is not
+ * consistent (there are mutually exclusive fields, etc.)
+ * @param  {object} object
  */
 class TaskObject {
     constructor(object) {
@@ -197,12 +250,12 @@ class TaskObject {
     }
 
     get id() {
-        return this._interval
+        return this._id
     }
     
     set date(newValue) {
         try {
-            this._date = this._DateField(newValue)
+            this._date = toDateField(newValue)
         } catch(err) {
             throw TypeError(`Invalid value of date: ${err.message}`)
         }
@@ -214,7 +267,7 @@ class TaskObject {
 
     set init_date(newValue) {
         try {
-            this._init_date = this._DateField(newValue)
+            this._init_date = toDateField(newValue)
         } catch(err) {
             throw TypeError(`Invalid value of init_date: ${err.message}`)
         }
@@ -225,7 +278,7 @@ class TaskObject {
     }
 
     set title(newValue) {
-        this._title = toString(newValue)
+        this._title = newValue
     }
 
     get title() {
@@ -233,7 +286,11 @@ class TaskObject {
     }
 
     set description(newValue) {
-        this._description = toString(newValue)
+        this._description = newValue
+    }
+
+    get description() {
+        return this._description
     }
 
     set completion(newValue) {
@@ -241,7 +298,7 @@ class TaskObject {
             this._completion = newValue
         } else {
             try {
-                this._completion = this._DateField(newValue)
+                this._completion = toDateField(newValue)
             } catch(err) {
                 throw TypeError(`Invalid value of completion: ${err.message}`)
             } 
@@ -292,12 +349,11 @@ class TaskObject {
         this._files = newValue
     }
 
-    
     /**
      * @param  {object} definedValues
      */
     static getEmpty(definedValues) {
-        let taskObj = {
+        let emptyTaskObj = {
             id: undefined,
             date: undefined,
             init_date: undefined,
@@ -308,36 +364,35 @@ class TaskObject {
             autoshift: false,
             files: [],
         }
-        if(definedValues) {
-            Object.assign(taskObj, definedValues)
+        if (definedValues) {
+            Object.assign(emptyTaskObj, definedValues)
         }
-        return taskObj
-    }
-
-    /**
-     * Descriptor that makes from given value a Date if it isn't
-     * already type of Date.
-     */
-    _DateField(date) {
-        if (date instanceof Date) {
-            return date
-        } else if (typeof date === 'string'){
-            const dateObject = new Date(date)
-            
-            if (isNaN(dateObject.getDate())) {
-                throw new TypeError ('cannot make valid Date object ' +
-                                     `from "${date}"`)
-            } else {
-                return dateObject
-            }
-        }
-        else {
-            throw new TypeError ('cannot make valid Date object ' +
-                                 `from "${date}" - only Date objects ` +
-                                 'and strings are allowed as args')
-        }
+        return emptyTaskObj
     }
 }
 
+/**
+ * Function to make a Date from given value, if it isn't
+ * already type of Date.
+ */
+function toDateField(date) {
+    if (date instanceof Date) {
+        return date
+    } else if (typeof date === 'string'){
+        const dateObject = new Date(date)
+        
+        if (isNaN(dateObject.getDate())) {
+            throw new TypeError ('cannot make valid Date object ' +
+                                    `from "${date}"`)
+        } else {
+            return dateObject
+        }
+    }
+    else {
+        throw new TypeError ('cannot make valid Date object ' +
+                                `from "${date}" - only Date objects ` +
+                                'and strings are allowed as args')
+    }
+}
 
-module.exports = {CacheService, TaskObject}
+module.exports = {CacheService, TaskObject, TaskArray}
