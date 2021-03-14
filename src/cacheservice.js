@@ -8,7 +8,6 @@ class TaskArray extends Array {
                 [task.date.getDate(), task.date.getMonth()],
                 [checkingDate.getDate(), checkingDate.getMonth()]
             )) {
-                
                 if (!task.completion) {
                     return 'got tasks'
                 } else {
@@ -201,39 +200,32 @@ class CacheService {
  */
 class TaskObject {
     constructor(object) {
+        this._object = copyObject(object)
+
         // Task identifier
         this.id = object.id
-        this._id
         // Current date of the task. The task might be created on another
         // date and repeated according to this.interval parameter.
         // Therefore this.date and this.init_date can differ)
         this.date = object.date
-        this._date
         // Date when the task was created by user
         this.init_date = object.init_date
-        this._init_date
         // User-defined task name 
         this.title = object.title
-        this._title 
         // user-defined description of the task 
         this.description = object.description
-        this._description 
         // date and time when a user marked the task as completed
         this.completion = object.completion
-        this._completion
         // Parameter which represents whether the task should be repeated
         // according to certain interval of time or not
         this.interval = object.interval
-        this._interval
         // a value indicating whether the task should be rescheduled to the
         // next date if it was not completed on time (shifted if not completed)
         this.autoshift = object.autoshift
-        this._autoshift
         // File, attached to the user-created task (text document,
         // spreadsheet, etc.). File represented as a link to the place
         // where the task stored.
         this.files = object.files
-        this._files
     }
 
     set id(newValue) {
@@ -245,60 +237,60 @@ class TaskObject {
         } else if (newValue < 1) {
             throw 'task id should be >= 1'
         } else {
-            this._id = newValue
+            this._object.id = newValue
         }
     }
 
     get id() {
-        return this._id
+        return this._object.id
     }
     
     set date(newValue) {
         try {
-            this._date = toDateField(newValue)
+            this._object.date = toDateField(newValue)
         } catch(err) {
             throw TypeError(`Invalid value of date: ${err.message}`)
         }
     }
-
+    
     get date() {
-        return this._date
+        return this._object.date
     }
 
     set init_date(newValue) {
         try {
-            this._init_date = toDateField(newValue)
+            this._object.init_date = toDateField(newValue)
         } catch(err) {
             throw TypeError(`Invalid value of init_date: ${err.message}`)
         }
     }
 
     get init_date() {
-        return this._init_date
+        return this._object.init_date
     }
-
+ 
     set title(newValue) {
-        this._title = newValue
+        this._object.title = newValue
     }
 
     get title() {
-        return this._title
+        return this._object.title
     }
 
     set description(newValue) {
-        this._description = newValue
+        this._object.description = newValue
     }
 
     get description() {
-        return this._description
+        return this._object.description
     }
 
     set completion(newValue) {
         if (newValue === false) {
-            this._completion = newValue
+            this._object.completion = newValue
         } else {
             try {
-                this._completion = toDateField(newValue)
+                this._object.completion = toDateField(newValue)
             } catch(err) {
                 throw TypeError(`Invalid value of completion: ${err.message}`)
             } 
@@ -306,15 +298,15 @@ class TaskObject {
     }
 
     get completion() {
-        return this._completion
+        return this._object.completion
     }
 
     set interval(newValue) {
         if (newValue === 'no' || newValue === false) {
-            this._interval = newValue
+            this._object.interval = newValue
         }
-        else if (!this.autoshift) {
-            this._interval = newValue
+        else if (!this._object.autoshift) {
+            this._object.interval = newValue
         } else {
             throw 'cannot assign interval to the task ' + 
                   'where exists autoshift value'
@@ -322,36 +314,33 @@ class TaskObject {
     }
 
     get interval() {
-        return this._interval
+        return this._object.interval
     }
 
     set autoshift(newValue) {
         if (newValue === false) {
-            this._autoshift = newValue
-        } else if (this.interval === 'no' || !this.interval) {
-            this._autoshift = newValue
+            this._object.autoshift = newValue
+        } else if (this._object.interval === 'no' || !this._object.interval) {
+            this._object.autoshift = newValue
         } else {
-            throw 'cannot assign autoshift to the ' + 
-                  'task where exists interval value'
+            throw ('cannot assign autoshift to the ' + 
+                   'task where exists interval value')
         }
     }
 
     get autoshift() {
-        return this._autoshift
-    }
-
-    get files() {
-        return this._files
+        return this._object.autoshift
     }
 
     set files(newValue) {
         // TODO: files attaching
-        this._files = newValue
+        this._object.files = newValue
     }
 
-    /**
-     * @param  {object} definedValues
-     */
+    get files() {
+        return this._object.files
+    }
+
     static getEmpty(definedValues) {
         let emptyTaskObj = {
             id: undefined,
@@ -370,6 +359,7 @@ class TaskObject {
         return emptyTaskObj
     }
 }
+
 
 /**
  * Function to make a Date from given value, if it isn't
@@ -394,5 +384,6 @@ function toDateField(date) {
                                 'and strings are allowed as args')
     }
 }
+
 
 module.exports = {CacheService, TaskObject, TaskArray}

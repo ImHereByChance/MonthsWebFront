@@ -24,7 +24,7 @@ const taskFromServer = {
 test('TaskObject throws error if no id', () => {
     
     let taskWithoutId = copyObject(taskFromServer)
-    delete taskWithoutId.id
+    taskWithoutId.id = undefined
     expect(() => {
         new TaskObject(taskWithoutId)
     }).toThrow('task should have id')
@@ -73,13 +73,16 @@ test('Task.object.completion is whether a date or false', () => {
     taskWithCompletionFalse.completion = false
     let taskObject = new TaskObject(taskWithCompletionFalse)
     expect(taskObject.completion).toBe(false)
+    
 })
+
 
 test('Task throws error if given autoshift ' + 
      'when interval value already exists',() => {
     
     let taskObject = new TaskObject(taskFromServer)
     expect(() => {
+        taskObject.interval = 'every_day'
         taskObject.autoshift = true
     }).toThrow('cannot assign autoshift to the ' + 
                'task where exists interval value')
@@ -129,12 +132,10 @@ test('CheckDailyTasks returns "got tasks" string', () => {
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 1))).toBe('got tasks')
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 2))).toBe('got tasks')
 
-    let extraTask = new TaskObject(taskArray[2])
-    
+    let extraTask = new TaskObject(taskArray[2]._object)
     extraTask.id = 99
     extraTask.title = 'extra task for tasting'
     extraTask.completion = false
-    
     taskArray.push(extraTask) 
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 3))).toBe('got tasks')
 })
