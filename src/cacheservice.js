@@ -1,19 +1,25 @@
 const {copyObject} = require('./copy')
 
+/**
+ * Wrapper for Array to handle TaskObject-s inside it. */
 class TaskArray extends Array {
-    checkDailyTasks(checkingDate) {
+    /**
+     * ->  Does this array contain tasks for the specified date?
+     * <-  got tasks' | 'tasks done' |' no tasks' 
+     * @param  {Date} date
+     */
+    checkDailyTasks(date) {
         let haveDoneTasks = false
         for (let task of this) {
-            if (this._equals(
+            if (arraysEquals(
                 [task.date.getDate(), task.date.getMonth()],
-                [checkingDate.getDate(), checkingDate.getMonth()]
+                [date.getDate(), date.getMonth()]
             )) {
                 if (!task.completion) {
                     return 'got tasks'
                 } else {
                     haveDoneTasks = true
-                }
-                
+                }  
             }
         }
         if (haveDoneTasks) {
@@ -22,17 +28,45 @@ class TaskArray extends Array {
             return 'no tasks'
         }
     }
-
+    
     /**
-     * Simple function to compare two arrays
-     * @param  {Array} a - first array
-     * @param  {Array} b - second array
+     * Get TaskObject-s where TaskObject.date equals @param date
+     * @param  {Date} date
      */
-    _equals(a, b) {
-        return a.length === b.length && a.every((v, i) => v === b[i])
+    getDailyTasks(date){
+        let dailyTasks = []
+        
+        for(let task of this) {
+            if (date.getDate() === task.date.getDate()){
+                dailyTasks.push(task)
+            }
+        }
+        return dailyTasks
+    }
+}
+
+class DatesArray extends Array {
+    constructor(...args) {
+        super(...args)
+        this._convertStringsToDates(this)
     }
 
+    static from(arrayLike, ...args) {
+        let result = super.from(arrayLike, d => new Date(d))
+        if (args) {
+            return super.from(result, ...args)
+        } else {
+            return result
+        }
+    }
+    
+    _convertStringsToDates(array) {
+        for (let key of array.keys()) {
+                this[key] = new Date(this[key])
+        }
+    }
 }
+
 
 class CacheService {
     constructor(transportService) {
@@ -42,7 +76,7 @@ class CacheService {
         
         this.pageDate = this.currentDate
         
-        this.monthDaysArray = []
+        this.dateArray = []
         
         this.taskArray = []
         // Promise, of the data from the server
@@ -50,33 +84,29 @@ class CacheService {
     }
 
 
-    setDate(newDate) {
-        // also returns promise, that indicates receiving data from server
+    setDate(date) {
+        // returns promise, that should contain the data from the server
         console.log('%c requesting data for changing page date: ' +
                     `${this.pageDate}`, 'color: cornflowerblue')
-        return this._requestMonthPack(newDate)
-    }
-    
-    _requestMonthPack(date) {
-        // returns promise, that should contain the data from the server
+
         return transportService.getChangeMonthPack(date)
+            
             .then(pack => {
                 this.pageDate = toDateField(date)
                 this.monthDaysArray = pack.monthDates.map(d => new Date(d))
                 this.tasksArray = pack.tasksArray
-                
+
                 console.log('%c requested data successfully received ' + 
                             'from the server', 'color: yellowgreen')
                 console.log(this.tasksArray)
             })
+
             .catch(err => {
                 console.log('%c Failed to receive data for changing ' + 
                             `page date: ${this.pageDate}`, 'color: crimson')
                 throw err
             })
     }
-
-
 
 
     createTask(newTask) {
@@ -177,7 +207,7 @@ class CacheService {
         throw 'this property renamed to this.tasksArray'
     }
     get pageDaysArr() {
-        throw 'this property renamed to this.monthDaysArray'
+        throw 'this property renamed to this.datesArray'
     }
     _requestDataPack(...args) {
         throw 'this method renamed to this._requestMonthPack()'
@@ -341,6 +371,18 @@ class TaskObject {
         return this._object.files
     }
 
+    get object() {
+        let objectToReturn = copyObject(this._object)
+        for (let key of Object.keys(objectToReturn)) {
+            if (objectToReturn[key] instanceof Date) {
+                objectToReturn[key] = toProperISOString(
+                    objectToReturn[key]
+                )
+            }
+        }
+        return objectToReturn
+    }
+
     static getEmpty(definedValues) {
         let emptyTaskObj = {
             id: undefined,
@@ -373,17 +415,44 @@ function toDateField(date) {
         
         if (isNaN(dateObject.getDate())) {
             throw new TypeError ('cannot make valid Date object ' +
-                                    `from "${date}"`)
+                                 `from "${date}"`)
         } else {
             return dateObject
         }
     }
     else {
         throw new TypeError ('cannot make valid Date object ' +
-                                `from "${date}" - only Date objects ` +
-                                'and strings are allowed as args')
+                             `from "${date}" - only Date objects ` +
+                             'and strings are allowed as args')
     }
 }
 
 
-module.exports = {CacheService, TaskObject, TaskArray}
+/**
+ * Simple function to compare two arrays
+ * @param  {Array} a - first array
+ * @param  {Array} b - second array
+ */
+function arraysEquals(a, b) {
+    return (a.length === b.length
+        && a.every((v, i) => v === b[i]))
+}
+
+
+/** Make ISO string with trailing "+00:00" for a Date() object.
+ * (e.g.'2021-02-01T00:00:00+00:00' instead of '2021-02-01T00:00:00Z'
+ * as in the standard Date.toISOString() method). 
+ * @param  {} dateObj
+ */
+function toProperISOString(dateObj) {
+        let jsISOString = dateObj.toISOString()
+        let properISOString = jsISOString.slice(0, -1)
+        return properISOString + '+00:00'
+}
+
+
+
+module.exports = {
+    CacheService, TaskObject, TaskArray, DatesArray, copyObject,
+    toDateField
+}

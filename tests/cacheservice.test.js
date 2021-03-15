@@ -1,18 +1,22 @@
 const { ContextExclusionPlugin } = require('webpack');
-const {cacheService,TaskObject, TaskArray} = require('../src/cacheservice');
+const {cacheService, TaskObject, TaskArray, DatesArray} = require('../src/cacheservice');
 const {copyObject} = require('../src/copy')
 
 
+// ----TaskObject test----
+
+// SETUPS:
+// task as it comes from server (parsed from JSON object)
 const taskFromServer = {
     id: 1,
-    date: '2021-02-02T00:00:00+00:00',
-    init_date: '2021-02-01T00:00:00+00:00',
+    date: '2021-02-02T00:00:00.000+00:00',
+    init_date: '2021-02-01T00:00:00.000+00:00',
     title: 'task from server',
-    description: "user task just received from server" +
+    description: "user task just received from server " +
     "and retrieved from JSON",
     interval: "every_day",
     autoshift: false,
-    completion: '2021-02-01T00:00:00+00:00',
+    completion: '2021-02-01T00:00:00.000+00:00',
     files: [ 
         { id: 1, link: 'file/for/task from server', related_task_id: 1 },
         { id: 1,
@@ -47,7 +51,7 @@ test('TaskObject._DateField converts date-isostring to Date()', () => {
 
 })
 
-test('Task.object._DateField throws TypeError if invalid value was given', () => {
+test('TaskObject.object._DateField throws TypeError if invalid value was given', () => {
     let taskWithInvalidDate = copyObject(taskFromServer)
     taskWithInvalidDate.date = '20invalid_date20'
     expect(() => {
@@ -67,7 +71,7 @@ test('Task.object._DateField throws TypeError if invalid value was given', () =>
     }).toThrow(TypeError)
 })
 
-test('Task.object.completion is whether a date or false', () => {
+test('TaskObject.object.completion is whether a date or false', () => {
     
     let taskWithCompletionFalse = copyObject(taskFromServer)
     taskWithCompletionFalse.completion = false
@@ -77,7 +81,7 @@ test('Task.object.completion is whether a date or false', () => {
 })
 
 
-test('Task throws error if given autoshift ' + 
+test('TaskObject throws error if given autoshift ' + 
      'when interval value already exists',() => {
     
     let taskObject = new TaskObject(taskFromServer)
@@ -89,7 +93,7 @@ test('Task throws error if given autoshift ' +
 
 })
 
-test('Task throws error if given interval '  + 
+test('TaskObject throws error if given interval '  + 
      'when autoshift value already exists', () => {
 
         let taskObject = new TaskObject(taskFromServer)
@@ -102,10 +106,19 @@ test('Task throws error if given interval '  +
 
 })
 
+test('TaskObject return it own fields as an object with Date objects ' +
+     'converted to ISOStrings with trailing timezone notation', () => {
 
-// MonthTasks test
+    expect(new TaskObject(taskFromServer).object)
+        .toEqual(taskFromServer)
+        
+})
 
-// generate fake array of taskObject-s
+
+// ----MonthTasks test----
+
+// SETUPs:
+// generate fake array of TaskObjects.
 let taskObjectsExample = []
 for (let i=1; i<11; i++) {
     let newTask = new TaskObject(taskFromServer)
@@ -124,14 +137,19 @@ for (let i=1; i<11; i++) {
     }
     taskObjectsExample.push(newTask)
 }
+`
+console.log('"taskObjectsExample" - array of TaskObjects generated ' + 
+            'for testing MonthTasks class', taskObjectsExample)
+`
 
-
-test('CheckDailyTasks returns "got tasks" string', () => {
+test('checkDailyTasks returns "got tasks" string', () => {
     let taskArray = TaskArray.from(taskObjectsExample)
     
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 1))).toBe('got tasks')
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 2))).toBe('got tasks')
 
+    // case when there is completed and uncompleted task at the same date
+    // should also return 'got tasks'
     let extraTask = new TaskObject(taskArray[2]._object)
     extraTask.id = 99
     extraTask.title = 'extra task for tasting'
@@ -140,10 +158,107 @@ test('CheckDailyTasks returns "got tasks" string', () => {
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 3))).toBe('got tasks')
 })
 
+test('checkDailyTasks returns "tasks done" string', () => {
 
-//CacheService test
+    let taskArray = TaskArray.from(taskObjectsExample)
+    
+    expect(taskArray.checkDailyTasks(new Date(2021, 1, 3))).toBe('tasks done')
+    expect(taskArray.checkDailyTasks(new Date(2021, 1, 6))).toBe('tasks done')
+    expect(taskArray.checkDailyTasks(new Date(2021, 1, 9))).toBe('tasks done')
+
+})
+
+test('checkDailyTasks returns "no tasks" string', () => {
+
+    let taskArray = TaskArray.from(taskObjectsExample)
+
+    expect(taskArray.checkDailyTasks(new Date(2021, 1, 11)))
+        .toBe('no tasks')
+    
+    expect(taskArray.checkDailyTasks(new Date(2021, 0, 31)))
+        .toBe('no tasks')
+        
+    expect(taskArray.checkDailyTasks(new Date(2021, 0, 31)))
+        .toBe('no tasks')   
+})
+
+test('getDailyTasks', () => {
+
+    let taskArray = TaskArray.from(taskObjectsExample)
+    let expectedOutput = [
+        new TaskObject({
+            id: 1,
+            date: '2021-02-01T00:00:00.000Z',
+            init_date: '2021-02-01T00:00:00.000Z',
+            title: 'task from server #1',
+            description: "user task just received from server " +
+                         "and retrieved from JSON #1",
+            interval: 'no',
+            autoshift: false,
+            completion: false,
+            files: [
+                { id: 1, link: 'file/for/task from server', related_task_id: 1 },
+                { id: 1,
+                  link: 'second_file/for/task from server',
+                  related_task_id: 1 },
+            ] 
+        })
+    ]
+
+    expect(taskArray.getDailyTasks(new Date(2021, 1, 1)))
+        .toEqual(expectedOutput)
+
+    taskArray.push(taskArray[0])
+    expectedOutput.push(expectedOutput[0])
+    
+    expect(taskArray.getDailyTasks(new Date(2021, 1, 1)))
+        .toEqual(expectedOutput)
+
+    expect(taskArray.getDailyTasks(new Date(2021, 1, 11)))
+    .toEqual( [] )
+})
+
+
+//--- 
+// SETUPS:
+let dateStringsArray = [
+'2021-02-01T00:00:00+00:00',
+'2021-02-02T00:00:00+00:00',
+'2021-02-03T00:00:00+00:00',
+'2021-02-04T00:00:00+00:00',
+]
+
+
+test('DatesArray converts date-strings to Date objects ' + 
+'during initialization', () => {
+
+    let datesArray = new DatesArray(...dateStringsArray)
+
+    expect(datesArray.map(d => d.getTime()))
+        .toEqual(dateStringsArray
+            .map(d => new Date(d))
+            .map(d => d.getTime())
+        )
+    })
+
+test('DatesArray converts date-strings to Date objects ' + 
+'when used DatesArray.from() method', () => {
+    
+    let datesArray2 = DatesArray.from(dateStringsArray)
+    
+    expect(datesArray2.map(d => d.getTime()))
+        .toEqual(dateStringsArray
+            .map(d => new Date(d))
+            .map(d => d.getTime())
+        )
+})
+        
+// ----CacheService test----
+
+// SETUPs:
+// create class imitating behavior of the dependency of the CacheService
+
 class TransportServiceImitation {
-
     static getChangeMonthPack(date) {
         return new Promise((resolve, reject) => {
             let dates = []
@@ -190,6 +305,7 @@ class TransportServiceImitation {
             resolve(monthPack)
         })
     }
+
 }
 
 
