@@ -1,7 +1,9 @@
 import Widget from './widget'
 import './styles/main.css'
 const {copyObject} = require('./copy')
-const {TaskObject} = require('./cacheservice')
+const {CacheService, TaskObject} = require('./cacheservice')
+const {TransportService} = require('./transportservice')
+
 
 
 console.log('I am the entry point')
@@ -14,3 +16,5 @@ window.Widget = Widget
 window._mainContainer = _mainContainer
 window.copyObject = copyObject
 window.TaskObject = TaskObject
+window.TransportService = TransportService
+window.CacheService = CacheService

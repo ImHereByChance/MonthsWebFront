@@ -118,7 +118,8 @@ test('TaskObject return it own fields as an object with Date objects ' +
 // ----MonthTasks test----
 
 // SETUPs:
-// generate fake array of TaskObjects.
+// generate fake array of tasks and TaskObjects.
+
 let taskObjectsExample = []
 for (let i=1; i<11; i++) {
     let newTask = new TaskObject(taskFromServer)
@@ -142,7 +143,7 @@ console.log('"taskObjectsExample" - array of TaskObjects generated ' +
             'for testing MonthTasks class', taskObjectsExample)
 `
 
-test('checkDailyTasks returns "got tasks" string', () => {
+test('TaskArray.checkDailyTasks returns "got tasks" string', () => {
     let taskArray = TaskArray.from(taskObjectsExample)
     
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 1))).toBe('got tasks')
@@ -158,7 +159,7 @@ test('checkDailyTasks returns "got tasks" string', () => {
     expect(taskArray.checkDailyTasks(new Date(2021, 1, 3))).toBe('got tasks')
 })
 
-test('checkDailyTasks returns "tasks done" string', () => {
+test('TaskArray.checkDailyTasks returns "tasks done" string', () => {
 
     let taskArray = TaskArray.from(taskObjectsExample)
     
@@ -168,7 +169,7 @@ test('checkDailyTasks returns "tasks done" string', () => {
 
 })
 
-test('checkDailyTasks returns "no tasks" string', () => {
+test('TaskArray.checkDailyTasks returns "no tasks" string', () => {
 
     let taskArray = TaskArray.from(taskObjectsExample)
 
@@ -182,7 +183,7 @@ test('checkDailyTasks returns "no tasks" string', () => {
         .toBe('no tasks')   
 })
 
-test('getDailyTasks', () => {
+test('TaskArray.getDailyTasks', () => {
 
     let taskArray = TaskArray.from(taskObjectsExample)
     let expectedOutput = [
