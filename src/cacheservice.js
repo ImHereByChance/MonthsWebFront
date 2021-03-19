@@ -3,42 +3,48 @@ const {copyObject} = require('./copy')
 
 class CacheService {
     constructor(transportService) {
+        // class to interact with the server
         this.transportService = transportService
-        
+        // current date
         this.today = new Date()
-        
+        // the date containing month of the current calendar page
         this.pageDate = this.today
-        
+        // array of the Date() objects of the current calendar page
         this.datesArray = []
-        
+        // TaskObject()s for the dates the current calendar page
         this.tasksArray = []
-        // Promise of the data from the server
-        this.readyToRun = this.setDate(this.pageDate)  
     }
 
-
-    setDate(date) {
-        // returns promise, that should contain the data from the server
+    setPageDate(date) {
         console.log('%c requesting data for changing page date: ' +
                     `${this.pageDate}`, 'color: cornflowerblue')
 
-        return this.transportService.getMonthPack(date)
-            .then(pack => {
-                this.pageDate = date
-                this.datesArray = DatesArray.from(pack.dates)
-                this.tasksArray = TaskArray.from(pack.tasks)
+        return new Promise ((resolve, reject) => {
+            this.transportService.getMonthPack(date)
+                .then(pack => {
+                    this.pageDate = date
+                    this.datesArray = DatesArray.from(pack.dates)
+                    this.tasksArray = TaskArray.from(pack.tasks)
 
-                console.log('%c requested data successfully received ' + 
-                            'from the server', 'color: yellowgreen')
-                console.log(this.tasksArray)
-            })
-
-            .catch(err => {
-                console.log('%c Failed to receive data for changing ' + 
-                            `page date: ${this.pageDate}`, 'color: crimson')
-                throw err
-            })
+                    console.log('%c requested data successfully received ' + 
+                                'from the server', 'color: yellowgreen')
+                    console.log(this.tasksArray)
+                    resolve()
+                })
+                .catch(err => {
+                    console.log('%c Failed to receive data for changing ' + 
+                                `page date: ${this.pageDate}`, 'color: crimson')
+                    reject(err)
+                })
+        })
     }
+
+    // setPageDate(date) {
+    //     return new Promise((onResolve, onReject) => {
+    //         this._setPageDate(date)
+    //         onResolve()
+    //     })
+    // }
 
 
     createTask(newTask) {

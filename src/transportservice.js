@@ -1,12 +1,12 @@
 const SERVER_URLs = {
     base: 'http://127.0.0.1:8000/',
-    changeDate: '/taskmanager/changeDate',
+    changeDate: '/taskmanager/getDatePack',
     
 }
 
 
 class TransportService {
-    constructor(serverURLs) {
+    constructor(serverURLs=SERVER_URLs) {
         this.urls = serverURLs
     }
 
@@ -27,8 +27,10 @@ class TransportService {
         
         return fetch(url)
             .then(response => response.json())
-
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                throw err
+            })
     }
 }
 

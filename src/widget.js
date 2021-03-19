@@ -11,6 +11,7 @@ class Widget {
 
         // Parent widget - this widget will be located inside it.
         this.parent = parent
+        
         // HTML Element associated with this class instance 
         this.element = document.createElement(
             options.tagName ? options.tagName : 'DIV'
@@ -52,10 +53,10 @@ class Widget {
      * @returns {Widget} Widget
      */
     static fromHTML(parent, rawHTML) {
-        let element = Widget.makeElementFromHTML(rawHTML)
-        let Widget = new Widget(parent)
-        Widget.element = element
-        return Widget
+        let newElement = this.makeElementFromHTML(rawHTML)
+        let newWidget = new Widget(parent)
+        newWidget.element = newElement
+        return newWidget
     }
     
     /**
