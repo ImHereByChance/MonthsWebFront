@@ -14,11 +14,11 @@ class IconButton24 extends Widget {
     build(){
         super.build()
         this.SvgIcon.build()
-        if(this._localOptions.onclick) {
-            this.element.onclick = this._localOptions.onclick
+        if(this.defaultOptions.onclick) {
+            this.element.onclick = this.defaultOptions.onclick
         }
-        if (this._localOptions.context) {
-            this.element.context = this._localOptions.context
+        if (this.defaultOptions.context) {
+            this.element.context = this.defaultOptions.context
         }
     }
 }

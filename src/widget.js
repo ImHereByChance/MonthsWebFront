@@ -1,3 +1,4 @@
+const {copyObject} = require('./copy.js')
 /**
 * The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
@@ -9,7 +10,7 @@ class Widget {
     constructor(parent, options={}) {
         this._checkTypes(parent, options)
 
-        // Parent widget - this widget will be located inside it.
+        // Parent widget
         this.parent = parent
         
         // HTML Element associated with this class instance 
@@ -18,19 +19,17 @@ class Widget {
         )
         // HTML Element attributes you may specify before initialization
         this.options = options
-        // HTML id attribute (of this.element) and identifier of this class
-        // instance.
+        // HTML id attribute and id of this class instance.
         this.id = options.id ? options.id : this.makeId('w')
-        
+        // Variable to keep available the parameters that were set during
+        // initialization of this.
+        this.defaultOptions = copyObject(options)
+
         //                          Privates
 
         // Flex, block, etc. Private parameter to use it in this.hide()
         // and this.show() methods.
         this._defaultDisplayMode
-        // Keeps available the this.options, how they was given on
-        // instance constructor - otherwise, they would be assign via
-        // setter to the this.element object and not available any more.
-        this._localOptions = options
     }
     
     set options(newOptions) {
@@ -43,7 +42,7 @@ class Widget {
             throw err
         }
     }
-
+    
     /**
      * The alternative constructor, that takes as args parent `Widget`
      * and raw html string and returns a new Widget object based on
