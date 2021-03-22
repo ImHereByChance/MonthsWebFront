@@ -1,6 +1,7 @@
 const {Widget} = require('./widget.js')
 const {IconButton24} = require('./widget.common.js')
 const {svgPaths} = require('./svgpaths.js')
+const {toProperISOString} = require('./tools.js')
 
 
 class TaskPanel extends Widget {
@@ -300,10 +301,10 @@ class TaskItem extends Widget {
         // returns the values of user input from a task editing widgets
 
         return {
-            init_date: this.DateSettings.value + ' 00:00:00',
-            date: this.DateSettings.value + ' 00:00:00',
+            init_date: toProperISOString(new Date(this.DateSettings.value)),
+            date: toProperISOString(new Date(this.DateSettings.value)),
             interval: this.IntervalSettings.value,
-            autoshift: this.AutoshiftSettings.value,
+            autoshift: eval(this.AutoshiftSettings.value),  // "true" -> true
             title: this.InputTitle.value,
             description: this.InputDescription.value
         }
@@ -348,11 +349,11 @@ class TaskItem extends Widget {
             }
         })
 
-        if(autoshiftInput.value != 'no') {
+        if(autoshiftInput.value === 'true') {
             intervalInput.disable()
         }
         autoshiftInput.element.addEventListener('change', event => {
-            if(event.target.value != 'no') {
+            if(event.target.value === 'true') {
                 intervalInput.disable()
             } else {
                 intervalInput.enable()
@@ -456,7 +457,7 @@ class TaskAdder extends TaskItem {
                 }                  
             })
             .catch(err => {
-                console.error(err)
+                console.error('catched in the end point:', err)
             })
     }
 }
@@ -508,8 +509,8 @@ class TaskSettingsElement extends Widget {
             return inputWg
         } else if (type === 'autoshift') {
             const inputWg = new Select(this, [
-                ['no', 'no'],
-                ['yes', 'until completed']
+                [false, 'no'],
+                [true, 'until completed']
             ])
             inputWg.defaultValue = this.taskObj.autoshift
             return inputWg

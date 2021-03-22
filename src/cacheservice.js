@@ -1,4 +1,5 @@
-const {copyObject} = require('./copy')
+const  {copyObject, toDateField, arraysEquals, 
+        toProperISOString} = require('./tools')
 
 
 class CacheService {
@@ -39,20 +40,12 @@ class CacheService {
         })
     }
 
-    // setPageDate(date) {
-    //     return new Promise((onResolve, onReject) => {
-    //         this._setPageDate(date)
-    //         onResolve()
-    //     })
-    // }
-
-
     createTask(newTask) {
         return this.transportService.addNewTask(newTask)
         .then(() => {
             console.log('%c the task successfully added to DB', 'color: yellowgreen')
         })
-        .then(() => this.refreshData())
+        .then(() => this.setPageDate(this.pageDate))
         .catch(err => {
             console.error('fail to add the task')
             throw err
@@ -151,7 +144,7 @@ class CacheService {
         throw 'this method renamed to this._requestMonthPack()'
     }
     reqChangeDate(...args) {
-        throw 'this method renamed to this.setDate()'
+        throw 'this method renamed to this.setPageDate()'
     }
     refreshData() {
         throw "method deprecated - use setDate() instead it"
@@ -442,55 +435,10 @@ class DatesArray extends Array {
 
 
 // -------------------Other--------------------
-/**
- * Function to make a Date from given value, if it isn't
- * already type of Date.
- */
-function toDateField(date) {
-    if (date instanceof Date) {
-        return date
-    } else if (typeof date === 'string'){
-        const dateObject = new Date(date)
-        
-        if (isNaN(dateObject.getDate())) {
-            throw new TypeError ('cannot make valid Date object ' +
-                                 `from "${date}"`)
-        } else {
-            return dateObject
-        }
-    }
-    else {
-        throw new TypeError ('cannot make valid Date object ' +
-                             `from "${date}" - only Date objects ` +
-                             'and strings are allowed as args')
-    }
-}
 
-
-/**
- * Simple function to compare two arrays
- * @param  {Array} a - first array
- * @param  {Array} b - second array
- */
-function arraysEquals(a, b) {
-    return (a.length === b.length
-        && a.every((v, i) => v === b[i]))
-}
-
-
-/** Make ISO string with trailing "+00:00" for a Date() object.
- * (e.g.'2021-02-01T00:00:00+00:00' instead of '2021-02-01T00:00:00Z'
- * as in the standard Date.toISOString() method). 
- * @param  {} dateObj
- */
-function toProperISOString(dateObj) {
-        let jsISOString = dateObj.toISOString()
-        let properISOString = jsISOString.replace('Z','+00:00')
-        return properISOString
-}
 
 
 
 module.exports = {
-    CacheService, TaskObject, TaskArray, DatesArray, copyObject, toDateField
+    CacheService, TaskObject, TaskArray, DatesArray
 }

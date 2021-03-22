@@ -1,4 +1,4 @@
-const {copyObject} = require('./copy.js')
+const {copyObject} = require('./tools.js')
 /**
 * The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
@@ -12,7 +12,6 @@ class Widget {
 
         // Parent widget
         this.parent = parent
-        
         // HTML Element associated with this class instance 
         this.element = document.createElement(
             options.tagName ? options.tagName : 'DIV'
@@ -26,7 +25,7 @@ class Widget {
         this.defaultOptions = copyObject(options)
 
         //                          Privates
-
+        
         // Flex, block, etc. Private parameter to use it in this.hide()
         // and this.show() methods.
         this._defaultDisplayMode

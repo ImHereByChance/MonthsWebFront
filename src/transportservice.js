@@ -1,6 +1,9 @@
+const {getCookie} = require('./tools.js')
+
 const SERVER_URLs = {
     base: 'http://127.0.0.1:8000/',
     changeDate: '/taskmanager/getDatePack',
+    tasks: '/taskmanager/tasks'
     
 }
 
@@ -27,10 +30,21 @@ class TransportService {
         
         return fetch(url)
             .then(response => response.json())
-            .catch(err => {
-                console.error(err)
-                throw err
-            })
+    }
+    
+    addNewTask(task) {
+        const url = new URL(this.urls.tasks + '/', this.urls.base)
+        
+        return fetch(url, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(task)
+        })
     }
 }
 

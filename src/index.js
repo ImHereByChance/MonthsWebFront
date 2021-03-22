@@ -2,7 +2,7 @@ import './styles/main.css'
 const {Widget} = require('./widget')
 const {DayButton, Calendar} = require('./widget.calendar.js')
 const {TaskPanel} = require('./widget.taskpanel.js')
-const {copyObject} = require('./copy')
+const {copyObject} = require('./tools')
 const {CacheService, TaskObject} = require('./cacheservice')
 const {TransportService} = require('./transportservice')
 const {IconButton24} = require('./widget.common.js')
