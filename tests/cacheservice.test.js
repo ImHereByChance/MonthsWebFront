@@ -1,6 +1,5 @@
-const { ContextExclusionPlugin } = require('webpack');
-const {cacheService, TaskObject, TaskArray, DatesArray} = require('../src/cacheservice');
-const {copyObject} = require('../src/copy')
+const {cacheService, TaskObject, TaskArray, DatesArray} = require('../src/cacheservice')
+const {copyObject} = require('../src/tools')
 
 
 // ----TaskObject test----

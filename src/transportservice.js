@@ -34,7 +34,6 @@ class TransportService {
     
     addNewTask(task) {
         const url = new URL(this.urls.tasks + '/', this.urls.base)
-        
         return fetch(url, {
             method: 'POST',
             mode: 'cors',
@@ -44,6 +43,18 @@ class TransportService {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(task)
+        })
+    }
+
+    deleteTask(taskID) {
+        const url = new URL(this.urls.tasks + `/${taskID}`, this.urls.base)
+        return fetch(url, {
+            method: 'DELETE',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
         })
     }
 }

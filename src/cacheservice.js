@@ -52,6 +52,22 @@ class CacheService {
         })
     }
     
+    deleteTask(deletedTask) {
+        return this.transportService.deleteTask(deletedTask.id)
+        .then(() => {
+            console.log('%c the task was successfully deleted from DB', 'color: yellowgreen')
+            let taskIndex = this.tasksArray.indexOf(deletedTask)
+            this.tasksArray.splice(taskIndex, 1)
+        })
+        .catch(err => {
+            console.error('failed to delete the task')
+            throw err
+        })
+    }
+
+
+
+
     editTask(changedFields) {
         return this.transportService.changeTask(changedFields)
         .then(() => {
@@ -60,19 +76,6 @@ class CacheService {
         .then(() => this.refreshData())
         .catch(err => {
             console.error('fail to edit the task')
-            throw err
-        })
-    }
-    
-    deleteTask(deletedTask) {
-        return this.transportService.deleteTask(deletedTask)
-        .then(() => {
-            console.log('%c the task was successfully deleted from DB', 'color: yellowgreen')
-            let taskIndex = this.tasksArray.indexOf(deletedTask)
-            this.tasksArray.splice(taskIndex, 1)
-        })
-        .catch(err => {
-            console.error('failed to delete the task')
             throw err
         })
     }
@@ -95,6 +98,7 @@ class CacheService {
         })
     }
     
+
     // methods to move to another places
     checkDailyTasks(date) {
         throw ('move this method away from this class!') // TODO: fix it!
@@ -403,7 +407,10 @@ class TaskArray extends Array {
         for (let key of array.keys()) {
             if (this.key instanceof TaskObject) {
                 continue
-            }    
+            }
+            if (typeof this[key] === undefined) {
+                break
+            }
             this[key] = new TaskObject(this[key])
         }
     }
