@@ -12,7 +12,7 @@ class CacheService {
         this.pageDate = this.today
         // array of the Date() objects of the current calendar page
         this.datesArray = []
-        // TaskObject()s for the dates the current calendar page
+        // TaskObject()-s for the dates on the current calendar page
         this.tasksArray = []
     }
 
@@ -41,15 +41,22 @@ class CacheService {
     }
 
     createTask(newTask) {
-        return this.transportService.addNewTask(newTask)
-        .then(() => {
-            console.log('%c the task successfully added to DB', 'color: yellowgreen')
-        })
-        .then(() => this.setPageDate(this.pageDate))
-        .catch(err => {
-            console.error('fail to add the task')
-            throw err
-        })
+        // convert Date objects to ISO string with trailing timezone values
+        for (let key in newTask) {
+            if (newTask[key] instanceof Date) {
+                newTask[key] = toProperISOString(newTask[key])
+            }
+        }
+
+            return this.transportService.addNewTask(newTask)
+            .then(() => {
+                console.log('%c the task successfully added to DB', 'color: yellowgreen')
+            })
+            .then(() => this.setPageDate(this.pageDate))
+            .catch(err => {
+                console.error('fail to add the task')
+                throw err
+            })
     }
     
     deleteTask(deletedTask) {
@@ -65,93 +72,52 @@ class CacheService {
         })
     }
 
-
-
-
     editTask(changedFields) {
+        // convert Date objects to ISO string with trailing timezone values
+        for (let key in changedFields) {
+            if (changedFields[key] instanceof Date) {
+                changedFields[key] = toProperISOString(changedFields[key])
+            }
+        }
+
         return this.transportService.changeTask(changedFields)
-        .then(() => {
-            console.log('%c the task successfully changed at DB', 'color: yellowgreen')
-        })
-        .then(() => this.refreshData())
-        .catch(err => {
-            console.error('fail to edit the task')
-            throw err
-        })
+            .then(() => {
+                console.log('%c the task successfully changed at DB', 'color: yellowgreen')
+            })
+            .then(() => this.setPageDate(this.pageDate))
+            .catch(err => {
+                console.error('fail to edit the task')
+                throw err
+            })
     }
     
-    checkUncheckTask(checkingTask) {
-        return this.transportService.checkUncheckTask(checkingTask)
-        .then(() => {
-            console.log('%c information about the task completion was changed on DB', 'color: yellowgreen')
-            let unchangedTask
-            for(let task of this.tasksArray) {
-                if(task.id === checkingTask.id && task.date === checkingTask.date) {
-                    task.completion = checkingTask.completion
-                    break
-                }
-            }
-        })
-        .catch(err => {
-            console.error('failed to change information about the task completion on DB')
-            throw err
-        })
-    }
-    
+    checkUncheckTask(task) {
+        // Copy the fields that represented as Date() objects,
+        // before they will be converted to ISO strings.
+        const taskDate = task.date
+        const taskCompletion = task.completion
 
-    // methods to move to another places
-    checkDailyTasks(date) {
-        throw ('move this method away from this class!') // TODO: fix it!
-        let dateString = DateFormater.formatForBackend(date)
-        let haveDoneTasks = false
-        
-        for (let task of this.tasksArray) {
-            if (task.date === dateString) {
-                if (!task.completion) {
-                    return 'got tasks'
-                } else {
-                    haveDoneTasks = true
-                }
+        // convert Date objects to ISO string with trailing timezone values
+        for (let key in task) {
+            if (task[key] instanceof Date) {
+                task[key] = toProperISOString(task[key])
             }
         }
-        if (haveDoneTasks) {
-            return 'tasks done'
-        } else {
-            return 'no tasks'
-        }
-    }
-    getDailyTasks(date){
-        throw ('move this method away from this class!') // TODO: fix it!
-        let dateString = DateFormater.formatForBackend(date)
-        let dailyTasks = []
-        
-        for(let task of this.tasksArray) {
-            if (dateString === task.date){
-                dailyTasks.push(task)
-            }
-        }
-        return dailyTasks
-    }
-    isDateInMonth(date) {
-        throw ('move this method away from this class!') // TODO: fix it!
-        return date.getMonth() === this.pageDate.getMonth()
-    }
 
-    // deprecated
-    get taskList() {
-        throw 'this property renamed to this.tasksArray'
-    }
-    get pageDaysArr() {
-        throw 'this property renamed to this.datesArray'
-    }
-    _requestDataPack(...args) {
-        throw 'this method renamed to this._requestMonthPack()'
-    }
-    reqChangeDate(...args) {
-        throw 'this method renamed to this.setPageDate()'
-    }
-    refreshData() {
-        throw "method deprecated - use setDate() instead it"
+        return this.transportService.changeTask(task, true)
+            .then(() => {
+                console.log('%c information about the task completion was changed on DB', 'color: yellowgreen')
+                for(let t of this.tasksArray) {
+                    if(t.id === task.id && t.date === taskDate) {
+                        t.completion = taskCompletion
+                        break
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('failed to change information about the task completion on DB')
+                throw err
+            })
     }
 
 }
@@ -360,6 +326,7 @@ class TaskArray extends Array {
             return result
         }
     }
+
     /**
      * ->  Does this array contain tasks for the specified date?
      * <-  'got tasks' | 'tasks done' |' no tasks' 
@@ -408,7 +375,7 @@ class TaskArray extends Array {
             if (this.key instanceof TaskObject) {
                 continue
             }
-            if (typeof this[key] === undefined) {
+            if (typeof this[key] === 'undefined') {
                 break
             }
             this[key] = new TaskObject(this[key])
@@ -439,11 +406,6 @@ class DatesArray extends Array {
         }
     }
 }
-
-
-// -------------------Other--------------------
-
-
 
 
 module.exports = {

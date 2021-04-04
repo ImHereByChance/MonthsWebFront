@@ -1,4 +1,5 @@
-import './styles/main.css'
+// uncomment to add styles in main.html header -->
+// import './styles/main.css'
 const {Widget} = require('./widget')
 const {DayButton, Calendar} = require('./widget.calendar.js')
 const {TaskPanel} = require('./widget.taskpanel.js')

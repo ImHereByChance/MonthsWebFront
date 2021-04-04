@@ -1,6 +1,7 @@
 const {Widget} = require('./widget.js')
 const {IconButton24} = require('./widget.common.js')
 const {svgPaths} = require('./svgpaths.js')
+const {translate} = require('./translate')
 
 
 class Calendar extends Widget {

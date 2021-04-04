@@ -1,18 +1,22 @@
-const {Widget} = require('./widget.js')
-const {IconButton24} = require('./widget.common.js')
-const {svgPaths} = require('./svgpaths.js')
-const {toProperISOString} = require('./tools.js')
+const { Widget } = require('./widget.js')
+const { IconButton24 } = require('./widget.common.js')
+const { svgPaths } = require('./svgpaths.js')
+const { toProperISOString } = require('./tools.js')
+const { translate } = require('./translate.js')
+
+const { RU } = require('./languages/ru')
+let LANG = RU
 
 
 class TaskPanel extends Widget {
     constructor(parent, cacheService) {
         super(parent)
-        
+
         this.id = 'tp-taskpanel'
         this.cacheService = cacheService
 
         // the appropriate DayButton on the calendar widget, which have the same date.
-        this.relatedDayButton 
+        this.relatedDayButton
 
         // Child widgets
         this.Topbar = new Widget(this, {
@@ -23,15 +27,15 @@ class TaskPanel extends Widget {
             innerText: 'Date label'
         })
         this.TaskList = new TaskList(this)
-        
+
         this.CreateTaskBt = new IconButton24(this.Topbar, {
             id: 'tp-createTaskBt',
             onclick: this.TaskList.openTaskAdder.bind(this.TaskList)
-            }, svgPaths.addTask)
+        }, svgPaths.addTask)
 
     }
-   
-    get dailyTaskArray(){
+
+    get dailyTaskArray() {
         if (this.relatedDayButton) {
             let date = this.relatedDayButton.date
             return this.cacheService.tasksArray.getDailyTasks(date)
@@ -49,16 +53,16 @@ class TaskPanel extends Widget {
     }
 
     boundDayBt(dayButton) {
-        
+
         this.relatedDayButton = dayButton
         this.TaskList.update()
         this.DateLabel.element.innerText = dayButton.date.toDateString()
-        if(!this.CreateTaskBt.isBuilded()) {
+        if (!this.CreateTaskBt.isBuilded()) {
             this.CreateTaskBt.build()
         }
     }
 
-}       
+}
 
 
 class TaskList extends Widget {
@@ -67,20 +71,20 @@ class TaskList extends Widget {
         this.parent = parent
         this.id = 'tp-taskList'
         this.cacheService = this.parent.cacheService
-        this.options = {innerText: 'No tasks'}
-        
+        this.options = { innerText: translate('No tasks', LANG) }
+
         this.taskItemArray = this.initTaskItems()
     }
 
     initTaskItems() {
         let tasksToShow = this.taskArray
-        if(tasksToShow){
+        if (tasksToShow) {
             let itemsArray = []
             for (let task of tasksToShow) {
                 let taskItem = new TaskItem(this, task)
                 itemsArray.push(taskItem)
             }
-            return itemsArray 
+            return itemsArray
         }
     }
 
@@ -92,7 +96,7 @@ class TaskList extends Widget {
     }
 
     buildTaskItems() {
-        if(this.taskItemArray){
+        if (this.taskItemArray) {
             this.taskItemArray.forEach(taskItem => taskItem.build())
         }
     }
@@ -102,8 +106,8 @@ class TaskList extends Widget {
         // of tasks items in the TaskList div. If it becomes 0, the message “all tasks
         // completed” will be displayed.
         const itemsObserver = new MutationObserver((mutationsList, observer) => {
-            for (let mutation of mutationsList) { 
-                if(!mutation.target.childElementCount) {
+            for (let mutation of mutationsList) {
+                if (!mutation.target.childElementCount) {
                     mutation.target.style.fontSize = '18px'
                 } else {
                     mutation.target.style.fontSize = '0px'
@@ -111,7 +115,7 @@ class TaskList extends Widget {
                 return
             }
         })
-        const observerConfig = {attributes: false, childList: true, subtree: false}
+        const observerConfig = { attributes: false, childList: true, subtree: false }
         itemsObserver.observe(this.element, observerConfig)
     }
 
@@ -166,12 +170,12 @@ class TaskItem extends Widget {
             checked: this.taskObj.completion,
             onclick: this.checkUncheckCompletion.bind(this)
         }),
-        
-        // container for a divs that displays the title and description of
-        // the task or widgets for the user to edit the task
-        this.Main = new Widget(this, {
-            className: 'tp-taskitemMain'
-        })
+
+            // container for a divs that displays the title and description of
+            // the task or widgets for the user to edit the task
+            this.Main = new Widget(this, {
+                className: 'tp-taskitemMain'
+            })
 
 
         // divs that displays task's title and description
@@ -179,12 +183,12 @@ class TaskItem extends Widget {
             this.Title = new Widget(this.Main, {
                 className: 'tp-taskitemTitle',
                 innerText: this.taskObj.title
-            }), 
+            }),
             this.Description = new Widget(this.Main, {
                 className: 'tp-taskitemDescr',
                 innerText: this.taskObj.description,
             }),
-                
+
         ]
 
         // widgets for editing task fields (user input)
@@ -193,46 +197,46 @@ class TaskItem extends Widget {
             this.SaveCloseCont = new Widget(this.Main, {
                 className: 'tp-taskitemSaveClose',
             }),
-                this.SaveButton = new IconButton24(this.SaveCloseCont, {
-                    className: 'save_task',
-                    onclick: this.saveInputValues.bind(this)
-                }, svgPaths.saveTask), 
-                this.CloseEditorButton = new IconButton24(this.SaveCloseCont, {
-                    className: 'closeEditor',
-                    onclick: this.switchToDefaultMode.bind(this),
-                }, svgPaths.closeEditor),
-        
+            this.SaveButton = new IconButton24(this.SaveCloseCont, {
+                className: 'save_task',
+                onclick: this.saveInputValues.bind(this)
+            }, svgPaths.saveTask),
+            this.CloseEditorButton = new IconButton24(this.SaveCloseCont, {
+                className: 'closeEditor',
+                onclick: this.switchToDefaultMode.bind(this),
+            }, svgPaths.closeEditor),
+
             this.TaskTimeSettingsCont = new Widget(this.Main, {
                 className: 'tp-taskTimeSettings'
-            }),           
-                this.DateSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                    'date', this.taskObj, 'Postpone:'),                    
-                this.IntervalSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                    'interval', this.taskObj, 'Repeat:'),                    
-                this.AutoshiftSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                    'autoshift', this.taskObj, 'Auto postpone:'),
-        
-            this.InputTitle = new TaskSettingsElement(this.Main, 'input', this.taskObj, 
-                'Task name:'),
-        
+            }),
+            this.DateSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
+                'date', this.taskObj, translate('Postpone:', RU)),
+            this.IntervalSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
+                'interval', this.taskObj, translate('Repeat:', RU)),
+            this.AutoshiftSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
+                'autoshift', this.taskObj, translate('Auto postpone:', RU)),
+
+            this.InputTitle = new TaskSettingsElement(this.Main, 'input', this.taskObj,
+                translate('Task name:', RU)),
+
             this.InputDescription = new TaskSettingsElement(this.Main, 'textarea', this.taskObj,
-                'Description:')
+                translate('Description:', RU))
         ]
-        
+
         // buttons 'edit task(switch to editor mode)' and 'delete task'
         // (located outside the task item's Main container)
         this.RightButtons = [
             this.RightButtonsCont = new Widget(this, {
                 className: 'tp-taskitemRightBtns'
             }),
-                this.EditTaskButton = new IconButton24(this.RightButtonsCont, {
-                    className: 'button-icon24',
-                    onclick: this.switchToEditMode.bind(this)
-                }, svgPaths.editTask),
-                this.DeleteTaskButton = new IconButton24(this.RightButtonsCont, {
-                    className: 'button-icon24',
-                    onclick: this.removeSelf.bind(this)
-                }, svgPaths.deleteTask)
+            this.EditTaskButton = new IconButton24(this.RightButtonsCont, {
+                className: 'button-icon24',
+                onclick: this.switchToEditMode.bind(this)
+            }, svgPaths.editTask),
+            this.DeleteTaskButton = new IconButton24(this.RightButtonsCont, {
+                className: 'button-icon24',
+                onclick: this.removeSelf.bind(this)
+            }, svgPaths.deleteTask)
         ]
     }
 
@@ -241,12 +245,12 @@ class TaskItem extends Widget {
         this.checkDone.build()
         this.Main.build()
         this.RightButtons.forEach(wg => wg.build())
-        
+
         this.SaveButton.addCssClass('ti-SaveTaskBt')
         this.CloseEditorButton.addCssClass('ti-CloseEditorBt')
         this.DeleteTaskButton.addCssClass('tp-RightBtnsDelTask')
         this.EditTaskButton.addCssClass('tp-RightBtnsEditTask')
-        
+
         this.defaultWidgets.forEach(wg => wg.build())
     }
 
@@ -258,7 +262,7 @@ class TaskItem extends Widget {
         this.RightButtonsCont.hide()
         this.defaultWidgets.forEach(wg => wg.hide())
         this.editingWidgets.forEach(wg => {
-            if(!wg.isBuilded()) {
+            if (!wg.isBuilded()) {
                 wg.build()
             } else {
                 wg.show()
@@ -286,7 +290,7 @@ class TaskItem extends Widget {
                 // if the task have interval repeat and we need to refresh
                 // all of DayButtons on calendar widget to deleted repeats 
                 // that shouldn't exist anymore
-                if(this.taskObj.interval) {
+                if (this.taskObj.interval) {
                     calendar.refreshMonth()
                 } else {
                     this.relatedDayButton.updStatus()
@@ -301,8 +305,8 @@ class TaskItem extends Widget {
         // returns the values of user input from a task editing widgets
 
         return {
-            init_date: toProperISOString(new Date(this.DateSettings.value)),
-            date: toProperISOString(new Date(this.DateSettings.value)),
+            init_date: new Date(this.DateSettings.value),
+            date: new Date(this.DateSettings.value),
             interval: this.IntervalSettings.value,
             autoshift: eval(this.AutoshiftSettings.value),  // "true" -> true
             title: this.InputTitle.value,
@@ -332,15 +336,15 @@ class TaskItem extends Widget {
         const autoshiftInput = this.AutoshiftSettings.inputWidget
         const checkDone = this.checkDone.element
 
-        if(intervalInput.value != 'no' || checkDone.checked) {
+        if (intervalInput.value != 'no' || checkDone.checked) {
             dateInput.disable()
             autoshiftInput.disable()
-        } else if(!checkDone.checked) {
+        } else if (!checkDone.checked) {
             dateInput.enable()
             autoshiftInput.enable()
         }
         intervalInput.element.addEventListener('change', event => {
-            if(event.target.value != 'no' && !checkDone.checked) {
+            if (event.target.value != 'no' && !checkDone.checked) {
                 dateInput.disable()
                 autoshiftInput.disable()
             } else if (!checkDone.checked) {
@@ -349,11 +353,11 @@ class TaskItem extends Widget {
             }
         })
 
-        if(autoshiftInput.value === 'true') {
+        if (autoshiftInput.value === 'true') {
             intervalInput.disable()
         }
         autoshiftInput.element.addEventListener('change', event => {
-            if(event.target.value === 'true') {
+            if (event.target.value === 'true') {
                 intervalInput.disable()
             } else {
                 intervalInput.enable()
@@ -364,15 +368,15 @@ class TaskItem extends Widget {
     saveInputValues() {
         // takes the user's input from the task editing widgets and push it
         // on the server via cacheService.edit Task() method. If server succeed,
-        // updates appearance the application appropriately
+        // updates appearance ot the application appropriately
 
         let newTaskFields = this.takeInputValues()
-        newTaskFields.ID = this.taskObj.ID
-                          
+        newTaskFields.id = this.taskObj.id
+
         this.cacheService.editTask(newTaskFields)
             .then(() => {
                 calendar.updDayButtonsStatus()
-                taskPanel.TaskList.update()                    
+                taskPanel.TaskList.update()
             })
             .catch(err => {
                 console.error(err)
@@ -386,11 +390,11 @@ class TaskItem extends Widget {
         // appropriately updated
 
         let checkObject = {
-                ID: this.taskObj.ID,
-                date: this.taskObj.date,
+            id: this.taskObj.id,
+            date: this.taskObj.date,
         }
 
-        if(this.checkDone.element.checked) {
+        if (this.checkDone.element.checked) {
             checkObject.completion = this.taskObj.date
         } else {
             checkObject.completion = false
@@ -399,7 +403,7 @@ class TaskItem extends Widget {
             .then(() => {
                 this.relatedDayButton.updStatus()
             })
-            //TODO: error catching
+        //TODO: error catching
 
     }
 
@@ -424,7 +428,7 @@ class TaskAdder extends TaskItem {
         this.id = this.makeId('ta')
     }
 
-    build(){
+    build() {
         super.build()
         this.switchToEditMode()
         this.reBind()
@@ -438,23 +442,23 @@ class TaskAdder extends TaskItem {
 
     createNewTask() {
         let newTask = this.takeInputValues()
-        newTask.ID = this.taskObj.ID
+        newTask.id = this.taskObj.id
 
         let thereIsInterval
-        if(newTask.interval && newTask.interval != 'no'){
+        if (newTask.interval && newTask.interval != 'no') {
             thereIsInterval = true
         } else {
             thereIsInterval = false
         }
-                          
+
         this.cacheService.createTask(newTask)
             .then(() => {
                 this.remove()
                 calendar.updDayButtonsStatus()
                 taskPanel.TaskList.update()
-                if(thereIsInterval){
+                if (thereIsInterval) {
                     calendar.refreshMonth()
-                }                  
+                }
             })
             .catch(err => {
                 console.error('catched in the end point:', err)
@@ -471,7 +475,7 @@ class TaskSettingsElement extends Widget {
         this.taskObj = taskObj
 
         this.inputWidget = this.initInputWg(inputType)
-        this.label = new Widget(this, {tagName: 'label', innerText: labelText})
+        this.label = new Widget(this, { tagName: 'label', innerText: labelText })
     }
 
     build() {
@@ -489,14 +493,14 @@ class TaskSettingsElement extends Widget {
     }
 
     initInputWg(type) {
-        if (type === 'date'){
+        if (type === 'date') {
             return new Widget(this, {
                 tagName: 'input',
                 type: 'date',
                 name: 'new_date',
-                value: this.taskObj.init_date.toISOString().slice(0,10)
+                value: this.taskObj.init_date.toISOString().slice(0, 10)
             })
-        } else if (type === 'interval'){
+        } else if (type === 'interval') {
             const inputWg = new Select(this, [
                 ['no', 'no interval'],
                 ['every_day', 'every day'],
@@ -514,14 +518,14 @@ class TaskSettingsElement extends Widget {
             ])
             inputWg.defaultValue = this.taskObj.autoshift
             return inputWg
-        } else if (type === 'input'){
+        } else if (type === 'input') {
             const inputWg = new Widget(this, {
                 tagName: 'input',
-                type: 'text', 
+                type: 'text',
                 name: 'new_title',
                 maxlength: "80",
                 minlength: "1",
-                value: this.taskObj.title  
+                value: this.taskObj.title
             })
             return inputWg
         } else if (type === 'textarea') {
@@ -564,11 +568,11 @@ class Select extends Widget {
         this.defaultValue
     }
 
-    get value(){
+    get value() {
         return this.element.value
     }
 
-    set value(newValue){
+    set value(newValue) {
         this.element.value = newValue
     }
 
@@ -587,15 +591,15 @@ class Select extends Widget {
         return optionWidgets
     }
 
-    build(){
+    build() {
         super.build()
         this.optionsList.forEach(opt => opt.build())
-        
-        if(this.defaultValue) {
+
+        if (this.defaultValue) {
             this.value = this.defaultValue
         }
     }
 }
 
 
-module.exports = {TaskPanel}
+module.exports = { TaskPanel }

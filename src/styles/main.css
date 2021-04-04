@@ -6,26 +6,76 @@
     --extradark: #50617A;
 }
 
+
+#tp-taskList::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #5987c6;
+}
+
+#tp-taskList::-webkit-scrollbar
+{
+  width: 10px;
+  background-color: #ff0000;
+}
+
+#tp-taskList::-webkit-scrollbar-thumb
+{
+  background-color: #325a95;
+}
+
+
 /*MAIN */
 html {
     overflow-y: hidden;
+    height: 100%;
 }
 
 html, body, #_main-container {
-    height: 100%;
-    width: 100%;
     font-family: arial;
+}
+
+main {
     display: flex;
+    justify-content: center;
 }
 
 #_main-container {
-    display: flex;
-    align-items: stretch;
-    background: cornflowerblue;
+    max-width: 1000px;
     flex-grow: 1;
+    display: flex;
+    margin: 20px;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px #4174bb;
+    resize: both;
+}
+
+select,
+textarea,
+input {
+    min-height: 26px;
+    border-radius: 3px;
+    border: 0px;
+    background-color: white;
+    outline-color: #a2c7fa;
+}
+
+/*all elements in the center shoud follow these rules*/
+.center-area {
+    max-width: 1000px;
 }
 
 /*COMMON ELEMENTS */
+body {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background: var(--baselight);
+    flex-direction: column;
+    margin: 0px;
+    align-items: stretch;
+}
 
 button {
     cursor: pointer;
@@ -35,26 +85,15 @@ button > * {
   pointer-events: none;
 }
 
-input, select, textarea {
-    outline: none;
-}
-
-input:focus-within,
-select:focus-within,
-textarea:focus-within {
-    outline: 1px solid var(--additdark); 
-    border: 2px solid rgba(255, 255, 255, 0);
-    box-shadow: 0px 0px 2px 1px #00adff;
-}
-
 .button-icon24 {
     align-items: center;
     justify-content: center;
     border: none;
     transition: 0.3s;
-    padding: 0;
+    padding: 0px;
+    margin-right: 1px;
     background-color: #ffffff00;
-    margin: 2px;
+    color: white;
 }
 
 .button-icon12 {
@@ -67,18 +106,19 @@ textarea:focus-within {
 }
 
 .button-icon24:focus {
-    outline: none;
-    border: 1px dashed var(--baselight);
+    outline-color: #5689d6;
     }
 
 .button-icon24:active {
     outline: none;
-    border: 1px dashed aliceblue;
 }
 
 .svg-icon {
   width: 24px;
   height: 24px;
+  border-radius: 50px;
+  outline: none;
+  display: flex;
 }
 
 .svg-icon12 {
@@ -97,9 +137,87 @@ textarea:focus-within {
   stroke-width: 1;
 }
 
+
+/*HEADER*/
+header {
+    height: 60px;
+    background: var(--additdark);
+    display: flex;
+    justify-content: center;
+}
+
+.header-main-area {
+    flex-basis: 1000px;
+    align-self: stretch;
+    max-width: 1000px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0px 20px 0px 20px;
+}
+
+.header-element {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    align-items: center;
+    color: var(--baselight);
+    cursor: pointer;
+}
+
+#account {
+    align-self: center;
+    position: relative;
+}
+
+#account .svg-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#account
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect,
+    .svg-icon circle {
+    stroke: var(--baselight);
+    transition: 0.2s;
+}
+
+#account:hover {
+    background: blue;
+}
+
+#account:hover path {
+    stroke: red;
+}
+
+#account:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    top: 46px;
+}
+
+.dropdown-item {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block; 
+}
+
+
 /*CALENDAR*/
 #c-calendar {
-    max-width: 336px;
     flex-grow: 0;
     display: flex;
     flex-direction: column;
@@ -111,6 +229,7 @@ textarea:focus-within {
     background-color: var(--additlight);
     display: flex;
     justify-content: space-between;
+    padding: 5px 3px 0px;
 }
 
 #c-daysFrame {
@@ -118,19 +237,19 @@ textarea:focus-within {
     width: 336px;
     display: flex;
     flex-wrap: wrap;
-    margin: auto;
+    margin: 10px;
     background-color: #a85e5e;
 }
 
 /*DAY BUTTON*/
 .c-daysFrame__dayButton {
-    height: 48px; 
-    width: 48px;  
+    height: 48px;
+    width: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    border: #579bfa9e solid 1px;
+    border: #679de999 solid 1px;
     transition: 0.3s;
 }
 
@@ -143,7 +262,6 @@ textarea:focus-within {
 .c-daysFrame__dayButton:focus {
     outline: none;
     border: 1px solid var(--baselight);
-    box-shadow: 1px 1px 1px 1px aliceblue;
 }
 
 .c-daysFrame__dayButton:active {
@@ -160,7 +278,7 @@ textarea:focus-within {
 }
 
 .--out-month {
-    color: #a2c0eb;
+    color: #9ec7ff;
 }
 
 .c-topbar__swtcMonthBt {
@@ -189,6 +307,7 @@ textarea:focus-within {
     background: var(--additdark);
     display: flex;
     flex-direction: column;
+    align-items: stretch;
 }
 
 #tp-topbar {
@@ -197,6 +316,7 @@ textarea:focus-within {
     display: flex;
     justify-content: space-between;
     color: aliceblue;
+    padding-top: 5px;
 }
 
 #tp-dateLabel {
@@ -244,6 +364,7 @@ textarea:focus-within {
     display: flex;
     flex-direction: column;
     margin: 10px 5px;
+    min-width: 370px;
     overflow-y: scroll;
     text-align: center;
     color: #bfc9d2;
@@ -258,6 +379,7 @@ textarea:focus-within {
     border: solid 1px var(--additlight);
     margin-bottom: 5px;
     margin-left: 5px;
+    margin-right: 5px;
     flex-basis: 56px;
     flex-shrink: 0;
     display: flex;
@@ -272,13 +394,10 @@ textarea:focus-within {
 }
 
 .tp-taskitem 
-.button-icon24:active, .button-icon24:focus {
-    border: 1px dashed var(--extradark);
-}
+.button-icon24:active, .button-icon24:focus {}
 
 .tp-taskitem .button-icon12:focus {
-    border: 1px dashed var(--extradark);
-    background: rgb(0, 255, 13);   
+    border: 1px dashed var(--extradark);   
 }
 
 .tp-taskCheckout {
@@ -296,7 +415,6 @@ textarea:focus-within {
 .tp-taskitemTitle {
     overflow: hidden;
     overflow-wrap: anywhere;
-    flex-grow: 1;
     font-size: 14px;
     margin: 3px;
 }
@@ -305,7 +423,6 @@ textarea:focus-within {
     border-radius: 2px;
     background-color: #c9d2ef;
     overflow-wrap: anywhere;
-    flex-grow: 1;
     font-size: 14px;
     margin: 3px;
 }
@@ -325,21 +442,21 @@ textarea:focus-within {
     transition: 0.2s;
 }
 
-.tp-taskitemRightBtns .button-icon24 {
-    display: none
+.tp-taskitemRightBtns .button-icon24 path {
+  fill: #5689d6;
 }
 
 .tp-RightBtnsDelTask:hover path {
     fill:crimson;
 }
 
-.tp-RightBtnsEditTask:hover path{
+.tp-RightBtnsEditTask:hover path {
     fill: var(--baselight);
     fill: #202e5f;
 }
 
 .tp-taskitem:hover > .tp-taskitemRightBtns .button-icon24 {
-    display: flex;
+    display: block 
 }
 
 /*container for the 'save changes' and the 'close task redactor' buttons*/
@@ -377,37 +494,3 @@ textarea:focus-within {
     border-radius: 2px;
     margin-bottom: 5px;
 }
-
-.tp-taskFileSet {
-    display: flex;
-    justify-content: start;
-    flex-wrap: wrap;
-    font-size: 12;
-}
-
-.tp-taskFile {
-    display: flex;
-    align-items: center;
-    text-decoration: underline;
-    cursor: pointer;
-    margin-right: 5px;
-    background-color: aliceblue;
-    border-radius: 4px;
-    padding: 3px;
-    max-height: 14px;
-}
-
-.tp-taskFileAdd {
-}
-
-.tp-taskFile
-.svg-icon12 path,
-.svg-icon12 polygon,
-.svg-icon12 rect,
-.svg-icon12 circle,
-.tp-taskFileDelete {
-  fill: red;
-}
-
-
-

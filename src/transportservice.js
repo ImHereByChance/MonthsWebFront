@@ -57,6 +57,28 @@ class TransportService {
             },
         })
     }
+
+    changeTask(task, checkUncheck=false) {
+        const url = new URL(this.urls.tasks + `/${task.id}/`, this.urls.base)
+        let reqInit = {
+            method: 'PUT',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(task)
+        }
+
+        if (checkUncheck) {
+            reqInit.headers['checkUncheck'] = 1
+        }
+        
+        return fetch(url, reqInit)
+    }
+
+    
 }
 
 
