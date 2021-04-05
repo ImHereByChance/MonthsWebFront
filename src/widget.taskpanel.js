@@ -1,11 +1,13 @@
 const { Widget } = require('./widget.js')
 const { IconButton24 } = require('./widget.common.js')
 const { svgPaths } = require('./svgpaths.js')
-const { toProperISOString } = require('./tools.js')
 const { translate } = require('./translate.js')
 
-const { RU } = require('./languages/ru')
-let LANG = RU
+
+// TODO: move to settings module
+const { ruLocale } = require('./languages/ru')
+const { DateFormat } = require('./dateformat.js')
+let LOCALE = ruLocale
 
 
 class TaskPanel extends Widget {
@@ -15,7 +17,8 @@ class TaskPanel extends Widget {
         this.id = 'tp-taskpanel'
         this.cacheService = cacheService
 
-        // the appropriate DayButton on the calendar widget, which have the same date.
+        // the appropriate DayButton on the calendar widget, which have
+        // the same date
         this.relatedDayButton
 
         // Child widgets
@@ -53,10 +56,11 @@ class TaskPanel extends Widget {
     }
 
     boundDayBt(dayButton) {
-
         this.relatedDayButton = dayButton
         this.TaskList.update()
-        this.DateLabel.element.innerText = dayButton.date.toDateString()
+        this.DateLabel.element.innerText = DateFormat.dateLabel(
+                                                dayButton.date, LOCALE)
+        
         if (!this.CreateTaskBt.isBuilded()) {
             this.CreateTaskBt.build()
         }
@@ -71,7 +75,7 @@ class TaskList extends Widget {
         this.parent = parent
         this.id = 'tp-taskList'
         this.cacheService = this.parent.cacheService
-        this.options = { innerText: translate('No tasks', LANG) }
+        this.options = { innerText: translate('No tasks', LOCALE) }
 
         this.taskItemArray = this.initTaskItems()
     }
@@ -171,8 +175,8 @@ class TaskItem extends Widget {
             onclick: this.checkUncheckCompletion.bind(this)
         }),
 
-            // container for a divs that displays the title and description of
-            // the task or widgets for the user to edit the task
+            // container for a divs that displays the title and description
+            // of the task or widgets for the user to edit the task
             this.Main = new Widget(this, {
                 className: 'tp-taskitemMain'
             })
@@ -209,18 +213,20 @@ class TaskItem extends Widget {
             this.TaskTimeSettingsCont = new Widget(this.Main, {
                 className: 'tp-taskTimeSettings'
             }),
-            this.DateSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                'date', this.taskObj, translate('Postpone:', RU)),
+            this.DateSettings = new TaskSettingsElement(
+                this.TaskTimeSettingsCont,
+                'date', this.taskObj, translate('Postpone:', LOCALE)
+            ),
             this.IntervalSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                'interval', this.taskObj, translate('Repeat:', RU)),
+                'interval', this.taskObj, translate('Repeat:', LOCALE)),
             this.AutoshiftSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                'autoshift', this.taskObj, translate('Auto postpone:', RU)),
+                'autoshift', this.taskObj, translate('Auto postpone:', LOCALE)),
 
             this.InputTitle = new TaskSettingsElement(this.Main, 'input', this.taskObj,
-                translate('Task name:', RU)),
+                translate('Task name:', LOCALE)),
 
             this.InputDescription = new TaskSettingsElement(this.Main, 'textarea', this.taskObj,
-                translate('Description:', RU))
+                translate('Description:', LOCALE))
         ]
 
         // buttons 'edit task(switch to editor mode)' and 'delete task'
@@ -580,7 +586,7 @@ class Select extends Widget {
         let optionWidgets = []
         optionsList.forEach(pair => {
             let value = pair[0]
-            let text = pair[1]
+            let text = translate(pair[1], LOCALE)
             const optionWidget = new Widget(this, {
                 tagName: 'option',
                 value: value,

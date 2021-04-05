@@ -1,10 +1,11 @@
 const {getCookie} = require('./tools.js')
 
+
+// TODO: move to settings module
 const SERVER_URLs = {
     base: 'http://127.0.0.1:8000/',
-    changeDate: '/taskmanager/getDatePack',
-    tasks: '/taskmanager/tasks'
-    
+    changeDate: '/getDatePack',
+    tasks: '/tasks'
 }
 
 

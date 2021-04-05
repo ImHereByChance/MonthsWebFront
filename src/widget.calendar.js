@@ -1,38 +1,41 @@
-const {Widget} = require('./widget.js')
-const {IconButton24} = require('./widget.common.js')
-const {svgPaths} = require('./svgpaths.js')
-const {translate} = require('./translate')
+const { Widget } = require('./widget.js')
+const { IconButton24 } = require('./widget.common.js')
+const { svgPaths } = require('./svgpaths.js')
+const { DateFormat } = require('./dateformat')
+
+
+const { ruLocale } = require('./languages/ru')
+const LOCALE = ruLocale
 
 
 class Calendar extends Widget {
-    constructor (parent, cacheService) {
+    constructor(parent, cacheService) {
         super(parent)
-        
+
         this.id = 'c-calendar'
         this.cacheService = cacheService
-        
+
         this.date = this.cacheService.pageDate
         this.daysArr = this.cacheService.datesArray
 
         // Child widgets
         this.childWidgets = [
-            this.Topbar = new Widget(this, {id: 'c-topbar'}),
+            this.Topbar = new Widget(this, { id: 'c-topbar' }),
 
-            this.DaysFrame = new Widget(this, {id: 'c-daysFrame'}),
-            
+            this.DaysFrame = new Widget(this, { id: 'c-daysFrame' }),
+
             this.PrevMonthBtn = new IconButton24(this.Topbar, {
-                id: 'monthBack-bt', 
+                id: 'monthBack-bt',
                 onclick: this.toPrevMonth.bind(this),
             }, svgPaths.pointLeft),
-            
+
             this.MonthLabel = new Widget(this.Topbar, {
                 id: 'c-topbar__monthLabel',
-                // innerText: DateFormatter.makeMonthLabel(this.date)
-                innerText: this.date.getMonth() + '.' + this.date.getYear() 
+                innerText: DateFormat.monthLabel(this.date, LOCALE)
             }),
-            
+
             this.NextMonthBtn = new IconButton24(this.Topbar, {
-                id: 'monthForv-bt', 
+                id: 'monthForv-bt',
                 onclick: this.toNextMonth.bind(this),
             }, svgPaths.pointRight),
         ]
@@ -46,29 +49,29 @@ class Calendar extends Widget {
 
     build() {
         super.build()
-        
+
         this.childWidgets.forEach(ch => ch.build())
         this.DayButtonArr.forEach(btn => btn.build())
     }
 
     initDayButtons(frame, daysArr) {
         let array = []
-        for(let date of daysArr) {
+        for (let date of daysArr) {
             let btn = new DayButton(frame, date, this.cacheService, 42) // TODO: fix task panel arg
             array.push(btn)
         }
         return array
     }
-    
+
     configurateDayButtons(newDateList) {
         let index = 0
         for (let btn of this.DayButtonArr) {
             btn.configurate(newDateList[index])
             index += 1
-        }   
+        }
     }
 
-    updDayButtonsStatus(){
+    updDayButtonsStatus() {
         this.DayButtonArr.forEach(bt => bt.updStatus())
     }
 
@@ -78,7 +81,7 @@ class Calendar extends Widget {
                 this.date = this.cacheService.pageDate
                 this.daysArr = this.cacheService.datesArray
                 this.configurateDayButtons(this.daysArr)
-                this.MonthLabel.element.innerText = this.date.getMonth() + '.' + this.date.getYear() 
+                this.MonthLabel.element.innerText = DateFormat.monthLabel(this.date, LOCALE)
             })
             .catch(err => {
                 // TODO: proper error handling 
@@ -96,8 +99,8 @@ class Calendar extends Widget {
             newMonth = this.date.getMonth() + 1
             newYear = this.date.getYear() + 1900
         }
-        
-        let newDate = new Date(newYear, newMonth) 
+
+        let newDate = new Date(newYear, newMonth)
         this.reqChangeDate(resetTimezone(newDate))
     }
 
@@ -111,7 +114,7 @@ class Calendar extends Widget {
             newYear = this.date.getYear() + 1900
         }
 
-        let newDate = new Date(newYear, newMonth) 
+        let newDate = new Date(newYear, newMonth)
         this.reqChangeDate(resetTimezone(newDate))
     }
 
@@ -129,7 +132,7 @@ class DayButton extends Widget {
         this.element = document.createElement(this.tag)
         this.id = this.makeId('dBtn')
         this.element.className = 'c-daysFrame__dayButton'
-        
+
         this.cacheService = cacheService
         this.taskPanel = taskPanel
         this.date = date
@@ -153,7 +156,7 @@ class DayButton extends Widget {
             classList.remove('--no-tasks', '--got-tasks')
         } else if (status === 'got tasks') {
             classList.add('--got-tasks')
-            classList.remove('--no-tasks', '--tasks-done') 
+            classList.remove('--no-tasks', '--tasks-done')
         } else {
             throw 'no such status: ' + status
         }
@@ -162,13 +165,13 @@ class DayButton extends Widget {
     configurate(newDate) {
         this.date = newDate
         this.element.innerText = newDate.getDate()
-        
+
         this.updStatus()
-        if (this.date.getMonth() != this.cacheService.pageDate.getMonth()){
+        if (this.date.getMonth() != this.cacheService.pageDate.getMonth()) {
             this.element.classList.add('--out-month')
         } else {
             this.element.classList.remove('--out-month')
-        } 
+        }
     }
 
     reqChangeDate(newDate) {
@@ -176,7 +179,7 @@ class DayButton extends Widget {
         this.configurate(newDate)
     }
 
-    boundSelf(){
+    boundSelf() {
         taskPanel.boundDayBt(this)
     }
 
@@ -189,4 +192,4 @@ function resetTimezone(date) {
 }
 
 
-module.exports = {DayButton, Calendar}
+module.exports = { DayButton, Calendar }

@@ -3,13 +3,13 @@
  * translated string. Example:
  * ```
  * const DE = {'Good morning': 'Guten Morgen'}
- * translate('Good morning', DE) // Guten Morgen'
+ * translate('Good morning', DE) // 'Guten Morgen'
  * ```
  * @param  {string} str
  * @param  {object} lang
  */
-function translate(str, lang) {
-    let translation = lang[str]
+function translate(str, locale) {
+    let translation = locale.lines[str]
     if (typeof translation === 'string') {
         return translation
     } else {
