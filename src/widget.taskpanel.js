@@ -2,12 +2,10 @@ const { Widget } = require('./widget.js')
 const { IconButton24 } = require('./widget.common.js')
 const { svgPaths } = require('./svgpaths.js')
 const { translate } = require('./translate.js')
-
-
-// TODO: move to settings module
-const { ruLocale } = require('./languages/ru')
 const { DateFormat } = require('./dateformat.js')
-let LOCALE = ruLocale
+
+const CONFIG = require('./config')
+const LOCALE = CONFIG.LOCALE
 
 
 class TaskPanel extends Widget {
@@ -27,7 +25,7 @@ class TaskPanel extends Widget {
         })
         this.DateLabel = new Widget(this.Topbar, {
             id: 'tp-dateLabel',
-            innerText: 'Date label'
+            innerText: ''
         })
         this.TaskList = new TaskList(this)
 

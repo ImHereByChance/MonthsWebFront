@@ -48,4 +48,4 @@ const ruLocale = {
 }
 
 
-module.exports = { ruLocale }
+module.exports = ruLocale

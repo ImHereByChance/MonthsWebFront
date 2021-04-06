@@ -3,9 +3,8 @@ const { IconButton24 } = require('./widget.common.js')
 const { svgPaths } = require('./svgpaths.js')
 const { DateFormat } = require('./dateformat')
 
-
-const { ruLocale } = require('./languages/ru')
-const LOCALE = ruLocale
+const CONFIG = require('./config')
+const LOCALE = CONFIG.LOCALE
 
 
 class Calendar extends Widget {

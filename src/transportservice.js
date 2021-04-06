@@ -1,16 +1,9 @@
-const {getCookie} = require('./tools.js')
-
-
-// TODO: move to settings module
-const SERVER_URLs = {
-    base: 'http://127.0.0.1:8000/',
-    changeDate: '/getDatePack',
-    tasks: '/tasks'
-}
+const CONFIG = require('./config')
+const getCookie = require('./tools.js')
 
 
 class TransportService {
-    constructor(serverURLs=SERVER_URLs) {
+    constructor(serverURLs=CONFIG.SERVER_URLs) {
         this.urls = serverURLs
     }
 
