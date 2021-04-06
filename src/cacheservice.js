@@ -1,5 +1,4 @@
-const  {copyObject, toDateField, arraysEquals, 
-        toProperISOString} = require('./tools')
+const {copyObject, toDateField, arraysEquals, DateFormat} = require('./tools')
 
 
 class CacheService {
@@ -44,7 +43,7 @@ class CacheService {
         // convert Date objects to ISO string with trailing timezone values
         for (let key in newTask) {
             if (newTask[key] instanceof Date) {
-                newTask[key] = toProperISOString(newTask[key])
+                newTask[key] = DateFormat.toProperISOString(newTask[key])
             }
         }
 
@@ -76,7 +75,7 @@ class CacheService {
         // convert Date objects to ISO string with trailing timezone values
         for (let key in changedFields) {
             if (changedFields[key] instanceof Date) {
-                changedFields[key] = toProperISOString(changedFields[key])
+                changedFields[key] = DateFormat.toProperISOString(changedFields[key])
             }
         }
 
@@ -100,7 +99,7 @@ class CacheService {
         // convert Date objects to ISO string with trailing timezone values
         for (let key in task) {
             if (task[key] instanceof Date) {
-                task[key] = toProperISOString(task[key])
+                task[key] = DateFormat.toProperISOString(task[key])
             }
         }
 
@@ -276,7 +275,7 @@ class TaskObject {
         let objectToReturn = copyObject(this._object)
         for (let key of Object.keys(objectToReturn)) {
             if (objectToReturn[key] instanceof Date) {
-                objectToReturn[key] = toProperISOString(
+                objectToReturn[key] = DateFormat.toProperISOString(
                     objectToReturn[key]
                 )
             }
