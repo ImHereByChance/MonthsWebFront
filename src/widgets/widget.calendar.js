@@ -1,9 +1,9 @@
 const { Widget } = require('./widget.js')
 const { IconButton24 } = require('./widget.common.js')
-const { svgPaths } = require('./svgpaths.js')
-const { DateFormat } = require('./tools')
+const { svgPaths } = require('../svgpaths.js')
+const { DateFormat } = require('../tools')
 
-const CONFIG = require('./config')
+const CONFIG = require('../config')
 const LOCALE = CONFIG.LOCALE
 
 

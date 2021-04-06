@@ -1,4 +1,4 @@
-const {copyObject} = require('./tools.js')
+const { copyObject } = require('../tools.js')
 /**
 * The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
@@ -7,7 +7,7 @@ const {copyObject} = require('./tools.js')
 * @param  {object} options={ } - options of HTML Element
 */
 class Widget {
-    constructor(parent, options={}) {
+    constructor(parent, options = {}) {
         this._checkTypes(parent, options)
 
         // Parent widget
@@ -25,23 +25,23 @@ class Widget {
         this.defaultOptions = copyObject(options)
 
         //                          Privates
-        
+
         // Flex, block, etc. Private parameter to use it in this.hide()
         // and this.show() methods.
         this._defaultDisplayMode
     }
-    
+
     set options(newOptions) {
         delete newOptions.tagName
         try {
             Object.assign(this.element, newOptions)
-        } catch(err) {
+        } catch (err) {
             console.error(`cannot assign given options ${newOptions} to the`
-                          + `HTML element of the Widget`)
+                + `HTML element of the Widget`)
             throw err
         }
     }
-    
+
     /**
      * The alternative constructor, that takes as args parent `Widget`
      * and raw html string and returns a new Widget object based on
@@ -56,7 +56,7 @@ class Widget {
         newWidget.element = newElement
         return newWidget
     }
-    
+
     /**
      * Creates HTML Element from a raw string.
      * 
@@ -81,15 +81,15 @@ class Widget {
             this._defaultDisplayMode = this.element.style.display
         } catch (err) {
             console.error('cannot build Widget:', this)
-            throw(err)
+            throw (err)
         }
     }
-    
+
     /**
      * Is `this.element` already on the page?
      */
-    isBuilded(){
-        if(document.getElementById(this.id)){
+    isBuilded() {
+        if (document.getElementById(this.id)) {
             return true
         } else {
             return false
@@ -114,7 +114,7 @@ class Widget {
         let randInt = Math.floor(Math.random() * 99999)
         return typeChar + randInt
     }
-    
+
     /**
      * Removes HTML element of this `Widget` from the document.
      * Can be restored via this.build() 
@@ -127,13 +127,13 @@ class Widget {
      * Set `this.element.style.display` to 'none' - hides im from the page
      */
     hide() {
-        if(this._defaultDisplayMode != 'none'){
+        if (this._defaultDisplayMode != 'none') {
             let currentMode = this.element.style.display
             this.element._defaultDisplayMode = currentMode
         }
         this.element.style.display = 'none'
     }
-    
+
     /**
      * Sets this.element.style.display to the value, that was
      * given during initialization of this Widget instance
@@ -141,14 +141,14 @@ class Widget {
     show() {
         this.element.style.display = this._defaultDisplayMode
     }
-    
+
     /**
      * Make user unable to interact with this.element on the page
      */
     disable() {
         this.element.disabled = true
     }
-    
+
     /**
      * Make user able to interact with this.element on the page (if it was
      * disabled)
@@ -164,7 +164,7 @@ class Widget {
     removeCssClass(className) {
         this.element.classList.remove(className)
     }
-    
+
     /**
      * Validate args of the class constructor.
      * 
@@ -177,10 +177,10 @@ class Widget {
             & (parent.id != '_main-container')
         ) {
             throw new TypeError('first argument (parent) should ' +
-                                'be an instance of Widget')
+                'be an instance of Widget')
         }
     }
 }
 
 
-module.exports = {Widget}
+module.exports = { Widget }

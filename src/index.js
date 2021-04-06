@@ -1,12 +1,12 @@
 // uncomment to add styles in main.html header -->
 // import './styles/main.css'
-const {Widget} = require('./widget')
-const {DayButton, Calendar} = require('./widget.calendar.js')
-const {TaskPanel} = require('./widget.taskpanel.js')
+const {Widget} = require('./widgets/widget')
+const {DayButton, Calendar} = require('./widgets/widget.calendar.js')
+const {IconButton24} = require('./widgets/widget.common.js')
+const {TaskPanel} = require('./widgets/widget.taskpanel.js')
 const {copyObject} = require('./tools')
 const {CacheService, TaskObject} = require('./cacheservice')
 const {TransportService} = require('./transportservice')
-const {IconButton24} = require('./widget.common.js')
 const {svgPaths} = require('./svgpaths.js')
 
 

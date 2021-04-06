@@ -1,4 +1,4 @@
-const {Widget} = require('../src/widget')
+const {Widget} = require('../src/widgets/widget')
 
 
 document.body.innerHTML = '<div id="_main-container"></div>'

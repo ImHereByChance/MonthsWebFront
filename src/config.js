@@ -1,5 +1,5 @@
 module.exports = {
-// ...
+
     LOCALE: require('./languages/ru'),
     
     SERVER_URLs: {
@@ -7,5 +7,5 @@ module.exports = {
         changeDate: '/getDatePack',
         tasks: '/tasks'
     }
-// ...
+
 }

@@ -39,8 +39,6 @@ function getCookie(name) {
 }
 
 
-
-
 /*           WORKING WITH DATES AND RELATED TO IT                           
  ************************************************************/
 
