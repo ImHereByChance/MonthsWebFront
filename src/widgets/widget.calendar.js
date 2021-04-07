@@ -1,7 +1,7 @@
-const { Widget } = require('./widget.js')
-const { IconButton24 } = require('./widget.common.js')
-const { svgPaths } = require('../svgpaths.js')
-const { DateFormat } = require('../tools')
+const { Widget } = require('./widget')
+const { IconButton24 } = require('./widget.common')
+const { svgPaths } = require('../svgpaths')
+const { DateFormat, resetTimezone } = require('../tools')
 
 const CONFIG = require('../config')
 const LOCALE = CONFIG.LOCALE
@@ -48,7 +48,6 @@ class Calendar extends Widget {
 
     build() {
         super.build()
-
         this.childWidgets.forEach(ch => ch.build())
         this.DayButtonArr.forEach(btn => btn.build())
     }
@@ -56,7 +55,7 @@ class Calendar extends Widget {
     initDayButtons(frame, daysArr) {
         let array = []
         for (let date of daysArr) {
-            let btn = new DayButton(frame, date, this.cacheService, 42) // TODO: fix task panel arg
+            let btn = new DayButton(frame, date, this.cacheService)
             array.push(btn)
         }
         return array
@@ -125,7 +124,7 @@ class Calendar extends Widget {
 
 
 class DayButton extends Widget {
-    constructor(parent, date, cacheService, taskPanel) {
+    constructor(parent, date, cacheService) {
         super(parent)
         this.tag = 'button'
         this.element = document.createElement(this.tag)
@@ -133,7 +132,6 @@ class DayButton extends Widget {
         this.element.className = 'c-daysFrame__dayButton'
 
         this.cacheService = cacheService
-        this.taskPanel = taskPanel
         this.date = date
 
         this.options = {
@@ -178,16 +176,20 @@ class DayButton extends Widget {
         this.configurate(newDate)
     }
 
+    reachTaskPanel() {
+        let taskPanel = Widget.instanceList['tp-taskpanel']
+        if (!taskPanel) {
+            throw 'DayButton on the calendar cannot reach taskPanel ' + 
+                  `widget by id "tp-taskpanel": ${this.id}`
+        }
+        return taskPanel
+    }
+
     boundSelf() {
+        const taskPanel = this.reachTaskPanel()
         taskPanel.boundDayBt(this)
     }
 
-}
-
-function resetTimezone(date) {
-    let timezoneOffset = date.getTimezoneOffset() * 60 * 1000
-    let newDate = new Date(date.getTime() - timezoneOffset)
-    return newDate
 }
 
 

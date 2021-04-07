@@ -1,4 +1,5 @@
-/*                           MISC                           
+/**
+ *                           MISC                           
  ************************************************************/
 
 function copyObject(object) {
@@ -66,6 +67,12 @@ function toDateField(date) {
     }
 }
 
+function resetTimezone(date) {
+    let timezoneOffset = date.getTimezoneOffset() * 60 * 1000
+    let newDate = new Date(date.getTime() - timezoneOffset)
+    return newDate
+}
+
 const DateFormat = {
     monthLabel: (dateObj, locale) => {
         let month = locale.months[dateObj.getMonth()]
@@ -94,8 +101,9 @@ const DateFormat = {
  ************************************************************/
 
 /**
- * Takes a string in english and object with translations and returns
- * translated string. Example:
+ * Takes a string in english and object of locale with
+ * translations and returns translated string.
+ * Example:
  * ```
  * const DE = {'Good morning': 'Guten Morgen'}
  * translate('Good morning', DE) // 'Guten Morgen'
@@ -117,5 +125,5 @@ function translate(str, locale) {
 
 module.exports = {
     copyObject, getCookie, toDateField, arraysEquals,
-    translate, DateFormat: DateFormat,
+    translate, DateFormat: DateFormat, resetTimezone
 }

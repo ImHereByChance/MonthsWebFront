@@ -16,7 +16,7 @@ module.exports = {
         new HTMLWebpackPlugin({
             template: './index.html'
         }),
-        new CleanWebpackPlugin() 
+        new CleanWebpackPlugin(),
     ],
     module: {
         rules: [

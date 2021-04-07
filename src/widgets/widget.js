@@ -1,4 +1,10 @@
-const { copyObject } = require('../tools.js')
+const { copyObject } = require('../tools')
+
+
+// stores all widgets added to the document
+const _WIDGETS_REGISTRY = {}
+
+
 /**
 * The base class for widget entity, that combine simple
 * html element and logic of its behavior with attached data 
@@ -47,7 +53,7 @@ class Widget {
      * and raw html string and returns a new Widget object based on
      * given html string.
      * @param  {Widget} parent  -  where to place this 
-     * @param  {string} rawHTML  -  e.g "<div>example</div>"
+     * @param  {string} rawHTML  -  e.g `"<div>example</div>"`
      * @returns {Widget} Widget
      */
     static fromHTML(parent, rawHTML) {
@@ -60,7 +66,7 @@ class Widget {
     /**
      * Creates HTML Element from a raw string.
      * 
-     * @param  {string} rawHTML  -  e.g "<div>example</div>"
+     * @param  {string} rawHTML  -  e.g `"<div>example</div>"`
      */
     static makeElementFromHTML(rawHTML) {
         let parser = new DOMParser()
@@ -79,6 +85,7 @@ class Widget {
             let parentNode = document.getElementById(this.parent.id)
             parentNode.insertAdjacentElement('beforeend', this.element)
             this._defaultDisplayMode = this.element.style.display
+            _WIDGETS_REGISTRY[this.id] = this
         } catch (err) {
             console.error('cannot build Widget:', this)
             throw (err)
@@ -102,11 +109,9 @@ class Widget {
      * (may use to represent type of this `Widget`, for example).
      * ```
      * // Usage:
-     * > this.makeID('MyWidgetType')
-     * 'MyWidgetType14336'
+     * this.makeID('MyWidgetType') // 'MyWidgetType14336'
      * 
-     * > this.makeID('w')
-     * 'w54023'
+     * this.makeID('w') // 'w54023'
      * ```
      * @param  {string} typeChar  - 
      */
@@ -120,6 +125,7 @@ class Widget {
      * Can be restored via this.build() 
      */
     remove() {
+        delete _WIDGETS_REGISTRY[this.id]
         this.element.remove()
     }
 
@@ -163,6 +169,15 @@ class Widget {
 
     removeCssClass(className) {
         this.element.classList.remove(className)
+    }
+    
+    /**
+     * get an object where keys are identifiers of all Widgets (and id
+     * of their html elements either) added to the document and values
+     * are corresponding widget objects.
+     */
+    static get instanceList() {
+        return _WIDGETS_REGISTRY
     }
 
     /**

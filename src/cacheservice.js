@@ -3,7 +3,7 @@ const {copyObject, toDateField, arraysEquals, DateFormat} = require('./tools')
 
 class CacheService {
     constructor(transportService) {
-        // class to interact with the server
+        // to interact the server
         this.transportService = transportService
         // current date
         this.today = new Date()
@@ -304,7 +304,8 @@ class TaskObject {
 
 
 /**
- * Wrapper for Array to handle TaskObject-s inside it. */
+ * Wrapper for Array to handle TaskObject-s inside it. 
+ */
 class TaskArray extends Array {
     constructor(...args) {
         super(...args)

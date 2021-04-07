@@ -1,9 +1,9 @@
 const CONFIG = require('./config')
-const getCookie = require('./tools.js')
+const { getCookie } = require('./tools.js')
 
 
 class TransportService {
-    constructor(serverURLs=CONFIG.SERVER_URLs) {
+    constructor(serverURLs = CONFIG.SERVER_URLs) {
         this.urls = serverURLs
     }
 
@@ -18,14 +18,14 @@ class TransportService {
      */
     getMonthPack(date) {
         let httpParamDate = date.toISOString().replace('Z', '+00:00')
-        
+
         let url = new URL(this.urls.changeDate, this.urls.base)
         url.searchParams.append('date', httpParamDate)
-        
+
         return fetch(url)
             .then(response => response.json())
     }
-    
+
     addNewTask(task) {
         const url = new URL(this.urls.tasks + '/', this.urls.base)
         return fetch(url, {
@@ -52,7 +52,7 @@ class TransportService {
         })
     }
 
-    changeTask(task, checkUncheck=false) {
+    changeTask(task, checkUncheck = false) {
         const url = new URL(this.urls.tasks + `/${task.id}/`, this.urls.base)
         let reqInit = {
             method: 'PUT',
@@ -68,12 +68,12 @@ class TransportService {
         if (checkUncheck) {
             reqInit.headers['checkUncheck'] = 1
         }
-        
+
         return fetch(url, reqInit)
     }
 
-    
+
 }
 
 
-module.exports = {TransportService}
+module.exports = { TransportService }

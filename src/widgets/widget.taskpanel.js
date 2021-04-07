@@ -1,7 +1,7 @@
-const { Widget } = require('./widget.js')
-const { IconButton24 } = require('./widget.common.js')
-const { svgPaths } = require('../svgpaths.js')
-const { DateFormat, translate } = require('../tools.js')
+const { Widget } = require('./widget')
+const { IconButton24, Select } = require('./widget.common')
+const { svgPaths } = require('../svgpaths')
+const { DateFormat, translate } = require('../tools')
 
 const CONFIG = require('../config')
 const LOCALE = CONFIG.LOCALE
@@ -101,11 +101,12 @@ class TaskList extends Widget {
             this.taskItemArray.forEach(taskItem => taskItem.build())
         }
     }
-
+    /**
+     * creates a MutationObserver object that keeps track of the number
+     * of tasks items in the TaskList div. If it becomes 0, the message
+     * “all tasks completed” will be displayed.
+     */
     makeListObserver() {
-        // creates a MutationObserver object that keeps track of the number
-        // of tasks items in the TaskList div. If it becomes 0, the message “all tasks
-        // completed” will be displayed.
         const itemsObserver = new MutationObserver((mutationsList, observer) => {
             for (let mutation of mutationsList) {
                 if (!mutation.target.childElementCount) {
@@ -256,11 +257,11 @@ class TaskItem extends Widget {
 
         this.defaultWidgets.forEach(wg => wg.build())
     }
-
+    /**
+     * hides a task's title and description divs and shows the
+     * widgets for editing a task fields and options
+     */
     switchToEditMode() {
-        // hides a task's title and description divs and shows the widgets
-        // for editing a task fields and options
-
         this.checkDone.hide()
         this.RightButtonsCont.hide()
         this.defaultWidgets.forEach(wg => wg.hide())
@@ -273,20 +274,21 @@ class TaskItem extends Widget {
         })
         this.makeConstraints()
     }
-
+    /**
+     * hides a task's title and description divs and shows the widgets
+     * for editing a task fields and options
+     */
     switchToDefaultMode() {
-        // hides a task's title and description divs and shows the widgets for
-        // editing a task fields and options
-
         this.checkDone.show()
         this.defaultWidgets.forEach(wg => wg.show())
         this.editingWidgets.forEach(wg => wg.hide())
         this.RightButtonsCont.show()
     }
-
+    /**
+     * remove the task-item widget from the TaskList widget and
+     * delete related entry about the task in the database
+     */
     removeSelf() {
-        // remove the task-item widget from the TaskList widget and delete
-        // related entry about the task in the database
         this.cacheService.deleteTask(this.taskObj)
             .then(() => {
                 this.remove()
@@ -303,10 +305,10 @@ class TaskItem extends Widget {
                 throw err
             })
     }
-
+    /**
+     * returns the values of user input from a task editing widgets
+     */
     takeInputValues() {
-        // returns the values of user input from a task editing widgets
-
         return {
             init_date: new Date(this.DateSettings.value),
             date: new Date(this.DateSettings.value),
@@ -317,23 +319,26 @@ class TaskItem extends Widget {
         }
     }
 
+    /**
+     * Updates the text of the divs, that displaying a task's
+     * title and description
+     * @param  {object} newTaskFields
+     */
     updateFields(newTaskFields) {
-        // Updates the text of the divs, that displaying a task's
-        // title and description
-
         this.Title.element.innerText = newTaskFields.title
         this.Description.element.innerText = newTaskFields.description
     }
-
+    
+    /**
+     * To avoid conflicting states, in a task editing mode:
+     * 1) disables the widgets for date changing and "auto-postpone until
+     * completion" when chosen one of a task's interval repeating options;
+     * 2) disables the date changing and 'auto-postpone until completion' 
+     * widgets when a task marked as completed in the task settings;
+     * 3) disables the interval choosing widget when 'postpone until
+     * completion' option is active;  
+     */
     makeConstraints() {
-        // To avoid conflicting states, in a task editing mode:
-        //     1) disables the widgets for date changing and "auto-postpone until
-        // completion" when chosen one of a task's interval repeating options;
-        //     2) disables the date changing and 'auto-postpone until completion' 
-        // widgets when a task marked as completed in the task settings;
-        //     3) disables the interval choosing widget when 'postpone until 
-        // completion' option is active;  
-
         const dateInput = this.DateSettings.inputWidget
         const intervalInput = this.IntervalSettings.inputWidget
         const autoshiftInput = this.AutoshiftSettings.inputWidget
@@ -367,12 +372,12 @@ class TaskItem extends Widget {
             }
         })
     }
-
+    /**
+     * takes the user's input from the task editing widgets and push it
+     * on the server via cacheService.edit Task() method. If server succeed,
+     * updates appearance ot the application appropriately
+     */
     saveInputValues() {
-        // takes the user's input from the task editing widgets and push it
-        // on the server via cacheService.edit Task() method. If server succeed,
-        // updates appearance ot the application appropriately
-
         let newTaskFields = this.takeInputValues()
         newTaskFields.id = this.taskObj.id
 
@@ -385,13 +390,13 @@ class TaskItem extends Widget {
                 console.error(err)
             })
     }
-
+    /**
+     * sends user input from checkDone checkbox (which indicates whether
+     * a task marked as completed or not) to the server. If server
+     * responds with succeed, the appearance of the application will
+     * appropriately updated
+     */
     checkUncheckCompletion() {
-        // sends user input from checkDone checkbox (which indicates whether
-        // a task marked as completed or not) to the server. If server
-        // responds with succeed, the appearance of the application will
-        // appropriately updated
-
         let checkObject = {
             id: this.taskObj.id,
             date: this.taskObj.date,
@@ -554,54 +559,6 @@ class TaskSettingsElement extends Widget {
         return this.parent.cacheService
     }
 
-}
-
-
-class Select extends Widget {
-    //  Constructor of the Widget takes two args: parent Widget and optionList.
-    //  OptionsList arg should be represented as an array of arrays. 
-    //  Each nested array must consists of two items: 
-    //  1) value attr of html <option> element;
-    //  2) inner text of <option>.
-    constructor(parent, optionsList) {
-        super(parent)
-        this.tag = 'select'
-        this.element = document.createElement(this.tag)
-        this.optionsList = this.initOptions(optionsList)
-        this.defaultValue
-    }
-
-    get value() {
-        return this.element.value
-    }
-
-    set value(newValue) {
-        this.element.value = newValue
-    }
-
-    initOptions(optionsList) {
-        let optionWidgets = []
-        optionsList.forEach(pair => {
-            let value = pair[0]
-            let text = translate(pair[1], LOCALE)
-            const optionWidget = new Widget(this, {
-                tagName: 'option',
-                value: value,
-                text: text
-            })
-            optionWidgets.push(optionWidget)
-        })
-        return optionWidgets
-    }
-
-    build() {
-        super.build()
-        this.optionsList.forEach(opt => opt.build())
-
-        if (this.defaultValue) {
-            this.value = this.defaultValue
-        }
-    }
 }
 
 

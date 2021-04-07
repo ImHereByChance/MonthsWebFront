@@ -1,16 +1,14 @@
 // uncomment to add styles in main.html header -->
 // import './styles/main.css'
 const {Widget} = require('./widgets/widget')
-const {DayButton, Calendar} = require('./widgets/widget.calendar.js')
-const {IconButton24} = require('./widgets/widget.common.js')
-const {TaskPanel} = require('./widgets/widget.taskpanel.js')
+const {DayButton, Calendar} = require('./widgets/widget.calendar')
+const {IconButton24} = require('./widgets/widget.common')
+const {TaskPanel} = require('./widgets/widget.taskpanel')
 const {copyObject} = require('./tools')
 const {CacheService, TaskObject} = require('./cacheservice')
 const {TransportService} = require('./transportservice')
-const {svgPaths} = require('./svgpaths.js')
+const {svgPaths} = require('./svgpaths')
 
-
-console.log('I am the entry point')
 
 // Entire app launch initializations.
 const _mainContainer = document.getElementById('_main-container')
