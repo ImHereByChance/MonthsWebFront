@@ -1,3 +1,7 @@
+const CONFIG = require('./config')
+const LOCALE = CONFIG.LOCALE
+
+
 /**
  *                           MISC                           
  ************************************************************/
@@ -74,12 +78,12 @@ function resetTimezone(date) {
 }
 
 const DateFormat = {
-    monthLabel: (dateObj, locale) => {
+    monthLabel: (dateObj, locale=LOCALE) => {
         let month = locale.months[dateObj.getMonth()]
         let year = dateObj.getYear() + 1900
         return `${month}, ${year}`
     },
-    dateLabel: (dateObj, locale) => {
+    dateLabel: (dateObj, locale=LOCALE) => {
         const weekDay = locale.weekDays[dateObj.getDay()]
         const dateString = dateObj.toLocaleDateString(locale.languageTag)
         return `${weekDay}, ${dateString}`
@@ -111,7 +115,7 @@ const DateFormat = {
  * @param  {string} str
  * @param  {object} lang
  */
-function translate(str, locale) {
+function translate(str, locale=LOCALE) {
     let translation = locale.lines[str]
     if (typeof translation === 'string') {
         return translation

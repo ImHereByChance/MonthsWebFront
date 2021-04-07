@@ -3,9 +3,6 @@ const { IconButton24 } = require('./widget.common')
 const { svgPaths } = require('../svgpaths')
 const { DateFormat, resetTimezone } = require('../tools')
 
-const CONFIG = require('../config')
-const LOCALE = CONFIG.LOCALE
-
 
 class Calendar extends Widget {
     constructor(parent, cacheService) {
@@ -30,7 +27,7 @@ class Calendar extends Widget {
 
             this.MonthLabel = new Widget(this.Topbar, {
                 id: 'c-topbar__monthLabel',
-                innerText: DateFormat.monthLabel(this.date, LOCALE)
+                innerText: DateFormat.monthLabel(this.date)
             }),
 
             this.NextMonthBtn = new IconButton24(this.Topbar, {
@@ -79,7 +76,7 @@ class Calendar extends Widget {
                 this.date = this.cacheService.pageDate
                 this.daysArr = this.cacheService.datesArray
                 this.configurateDayButtons(this.daysArr)
-                this.MonthLabel.element.innerText = DateFormat.monthLabel(this.date, LOCALE)
+                this.MonthLabel.element.innerText = DateFormat.monthLabel(this.date)
             })
             .catch(err => {
                 // TODO: proper error handling 

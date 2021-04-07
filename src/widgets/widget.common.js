@@ -1,9 +1,6 @@
 const { Widget } = require('./widget')
 const { translate } = require('../tools')
 
-const CONFIG = require('../config')
-const LOCALE = CONFIG.LOCALE
-
 
 class IconButton24 extends Widget {
     constructor(parent, options = {}, svgHTML) {
@@ -57,7 +54,7 @@ class Select extends Widget {
         let optionWidgets = []
         optionsList.forEach(pair => {
             let value = pair[0]
-            let text = translate(pair[1], LOCALE)
+            let text = translate(pair[1])
             const optionWidget = new Widget(this, {
                 tagName: 'option',
                 value: value,

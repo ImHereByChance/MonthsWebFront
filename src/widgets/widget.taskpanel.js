@@ -3,9 +3,6 @@ const { IconButton24, Select } = require('./widget.common')
 const { svgPaths } = require('../svgpaths')
 const { DateFormat, translate } = require('../tools')
 
-const CONFIG = require('../config')
-const LOCALE = CONFIG.LOCALE
-
 
 class TaskPanel extends Widget {
     constructor(parent, cacheService) {
@@ -55,8 +52,7 @@ class TaskPanel extends Widget {
     boundDayBt(dayButton) {
         this.relatedDayButton = dayButton
         this.TaskList.update()
-        this.DateLabel.element.innerText = DateFormat.dateLabel(
-                                                dayButton.date, LOCALE)
+        this.DateLabel.element.innerText = DateFormat.dateLabel(dayButton.date)
         
         if (!this.CreateTaskBt.isBuilded()) {
             this.CreateTaskBt.build()
@@ -72,7 +68,7 @@ class TaskList extends Widget {
         this.parent = parent
         this.id = 'tp-taskList'
         this.cacheService = this.parent.cacheService
-        this.options = { innerText: translate('No tasks', LOCALE) }
+        this.options = { innerText: translate('No tasks') }
 
         this.taskItemArray = this.initTaskItems()
     }
@@ -213,18 +209,18 @@ class TaskItem extends Widget {
             }),
             this.DateSettings = new TaskSettingsElement(
                 this.TaskTimeSettingsCont,
-                'date', this.taskObj, translate('Postpone:', LOCALE)
+                'date', this.taskObj, translate('Postpone:')
             ),
             this.IntervalSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                'interval', this.taskObj, translate('Repeat:', LOCALE)),
+                'interval', this.taskObj, translate('Repeat:')),
             this.AutoshiftSettings = new TaskSettingsElement(this.TaskTimeSettingsCont,
-                'autoshift', this.taskObj, translate('Auto postpone:', LOCALE)),
+                'autoshift', this.taskObj, translate('Auto postpone:')),
 
             this.InputTitle = new TaskSettingsElement(this.Main, 'input', this.taskObj,
-                translate('Task name:', LOCALE)),
+                translate('Task name:')),
 
             this.InputDescription = new TaskSettingsElement(this.Main, 'textarea', this.taskObj,
-                translate('Description:', LOCALE))
+                translate('Description:'))
         ]
 
         // buttons 'edit task(switch to editor mode)' and 'delete task'
