@@ -105,7 +105,9 @@ class CacheService {
 
         return this.transportService.changeTask(task, true)
             .then(() => {
-                console.log('%c information about the task completion was changed on DB', 'color: yellowgreen')
+                console.log('%c information about the task '+
+                            'completion was changed on DB',
+                            'color: yellowgreen')
                 for(let t of this.tasksArray) {
                     if(t.id === task.id && t.date === taskDate) {
                         t.completion = taskCompletion
@@ -363,7 +365,8 @@ class TaskArray extends Array {
         let dailyTasks = []
         
         for(let task of this) {
-            if (date.getDate() === task.date.getDate()){
+            if (date.getDate() === task.date.getDate()
+                && date.getMonth() === task.date.getMonth()){
                 dailyTasks.push(task)
             }
         }

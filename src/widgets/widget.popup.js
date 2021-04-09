@@ -7,7 +7,7 @@ class PopUpWindow extends Widget {
         super(options.parent)
         this.cssClass = options.cssClass
         this.onclose = options.onclose
-        this.Caption = new Widget(this, { innerText: translate(options.message) })
+        this.Caption = new Widget(this, { innerText: translate(options.caption) })
         this.SvgPicture = Widget.fromHTML(this, options.svgPicture)
         this.ConformButton = new Widget(this, {
             tagName: 'button',
@@ -54,16 +54,16 @@ class PopUpWindow extends Widget {
         }
         // recursively traverse all child nodes of a parent Widget
         // element and disable (enable) all its nodes
-        traverseNodeChildren(parentNode, node => {
-            node.disabled = flag
+        traverseNodeChildren(parentNode, childNode => {
+            childNode.disabled = flag
         }, [this.element])
         // dim (or brighten) parent node to make it look disabled (active)
-        parentNode.childNodes.forEach(node => {
-            if(node != this.element) {
+        parentNode.childNodes.forEach(childNode => {
+            if(childNode != this.element) {
                 if (flag) {
-                    node.style.filter = 'brightness(0.5)';
+                    childNode.style.filter = 'brightness(0.5)';
                 } else {
-                    node.style.filter = 'brightness(1)'
+                    childNode.style.filter = 'brightness(1)'
                 }
             } 
         })

@@ -13,10 +13,8 @@
   background-color: #5987c6;
 }
 
-#tp-taskList::-webkit-scrollbar
-{
+#tp-taskList::-webkit-scrollbar {
   width: 10px;
-  background-color: #ff0000;
 }
 
 #tp-taskList::-webkit-scrollbar-thumb

@@ -4,6 +4,7 @@ const {Widget} = require('./widgets/widget')
 const {DayButton, Calendar} = require('./widgets/widget.calendar')
 const {IconButton24} = require('./widgets/widget.common')
 const {TaskPanel} = require('./widgets/widget.taskpanel')
+const { PopUpWindow } = require('./widgets/widget.popup')
 const {copyObject} = require('./tools')
 const {CacheService, TaskObject} = require('./cacheservice')
 const {TransportService} = require('./transportservice')
@@ -49,10 +50,9 @@ function giveConsoleAccess() {
     window.IconButton24 = IconButton24
     window.svgPaths = svgPaths
     window.TaskPanel = TaskPanel
+    window.PopUpWindow = PopUpWindow
 }
 
-const { PopUpWindow } = require('./widgets/widget.popup')
-window.PopUpWindow = PopUpWindow
 
 launch(_mainContainer)
 giveConsoleAccess()

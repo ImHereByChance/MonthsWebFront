@@ -19,7 +19,7 @@ function copyObject(object) {
  */
 function arraysEquals(a, b) {
     return (a.length === b.length
-        && a.every((v, i) => v === b[i]))
+            && a.every((v, i) => v === b[i]))
 }
 
 /**
@@ -98,14 +98,18 @@ function resetTimezone(date) {
 
 const DateFormat = {
     monthLabel: (dateObj, locale=LOCALE) => {
-        let month = locale.months[dateObj.getMonth()]
-        let year = dateObj.getYear() + 1900
-        return `${month}, ${year}`
+        return new Intl.DateTimeFormat(locale.languageTag, {
+            month: 'long',
+            year: 'numeric'
+        }).format(dateObj)
     },
     dateLabel: (dateObj, locale=LOCALE) => {
-        const weekDay = locale.weekDays[dateObj.getDay()]
-        const dateString = dateObj.toLocaleDateString(locale.languageTag)
-        return `${weekDay}, ${dateString}`
+        return new Intl.DateTimeFormat(locale.languageTag, {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        }).format(dateObj)
     },
     /** Make ISO string with trailing "+00:00" for a Date() object.
      * (e.g.'2021-02-01T00:00:00+00:00' instead of '2021-02-01T00:00:00Z'
