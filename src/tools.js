@@ -12,7 +12,6 @@ function copyObject(object) {
     return newCopy
 }
 
-
 /**
  * Simple function to compare two arrays
  * @param  {Array} a - first array
@@ -21,6 +20,26 @@ function copyObject(object) {
 function arraysEquals(a, b) {
     return (a.length === b.length
         && a.every((v, i) => v === b[i]))
+}
+
+/**
+ * Recursive traverse of child nodes of the given HTML element.
+ * @param  {object} element - html element
+ * @param  {function} handler - function to handle descendants of the given element
+ * @param  {Array} exclusions - list of nodes to exclude during traversal
+ */
+function traverseNodeChildren(element, handler, exclusions = []) {
+    if (element.childElementCount < 1) {
+        return
+    }
+    element.childNodes.forEach(childNode => {
+        if (!exclusions.includes(childNode)) {
+            traverseNodeChildren(childNode, handler, exclusions)
+        }
+    })
+    element.childNodes.forEach(childNode => {
+        handler(childNode)
+    })
 }
 
 
@@ -129,5 +148,6 @@ function translate(str, locale=LOCALE) {
 
 module.exports = {
     copyObject, getCookie, toDateField, arraysEquals,
-    translate, DateFormat: DateFormat, resetTimezone
+    translate, DateFormat: DateFormat, resetTimezone,
+    traverseNodeChildren
 }

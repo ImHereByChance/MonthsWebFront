@@ -12,40 +12,47 @@ const {svgPaths} = require('./svgpaths')
 
 // Entire app launch initializations.
 const _mainContainer = document.getElementById('_main-container')
-const transportService = new TransportService()
-const cacheService = new CacheService(transportService)
-let calendar
-let taskPanel
-    
-cacheService.setPageDate(cacheService.today)
-    .then( () => {
-        calendar = new Calendar(_mainContainer, cacheService)
-        taskPanel = new TaskPanel(_mainContainer, cacheService)
-        calendar.build()
-        taskPanel.build()
+
+function launch(mainContainer) {
+    const transportService = new TransportService()
+    const cacheService = new CacheService(transportService)
+    let calendar
+    let taskPanel
         
-    })
-    .catch( err => {
-        console.error(err)
-        alert(err.errorTraceback)
-    })
-    .then(() => {
+    cacheService.setPageDate(cacheService.today)
+        .then( () => {
+            calendar = new Calendar(mainContainer, cacheService)
+            taskPanel = new TaskPanel(mainContainer, cacheService)
+            calendar.build()
+            taskPanel.build()  
+        })
+        .catch( err => {
+            console.error(err)
+            alert(err.errorTraceback)
+        })
+        .then(() => {
+            // Make these accessible from browser dev tools console
+            window.calendar = calendar
+            window.taskPanel = taskPanel
+        })
+}
 
-// Make these accessible from browser dev tools console
-window.Widget = Widget
-window._mainContainer = _mainContainer
-window.copyObject = copyObject
-window.TaskObject = TaskObject
-window.TransportService = TransportService
-window.CacheService = CacheService
-window.DayButton = DayButton
-window.Calendar = Calendar
-window.IconButton24 = IconButton24
-window.svgPaths = svgPaths
-window.TaskPanel = TaskPanel
+function giveConsoleAccess() {
+    window.Widget = Widget
+    window._mainContainer = _mainContainer
+    window.copyObject = copyObject
+    window.TaskObject = TaskObject
+    window.TransportService = TransportService
+    window.CacheService = CacheService
+    window.DayButton = DayButton
+    window.Calendar = Calendar
+    window.IconButton24 = IconButton24
+    window.svgPaths = svgPaths
+    window.TaskPanel = TaskPanel
+}
 
+const { PopUpWindow } = require('./widgets/widget.popup')
+window.PopUpWindow = PopUpWindow
 
-window.calendar = calendar
-window.taskPanel = taskPanel
-
-})
+launch(_mainContainer)
+giveConsoleAccess()
