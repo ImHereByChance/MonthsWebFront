@@ -16,6 +16,7 @@ const ruLocale = {
       'every year': 'ежегодно',
       'until completed': 'до выполнения',
       'no': 'нет',
+      'server is temporary unavailable..': 'сервер временно недоступен..'
    }
 }
 

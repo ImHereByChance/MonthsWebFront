@@ -1,5 +1,6 @@
 const CONFIG = require('./config')
 const { getCookie } = require('./tools.js')
+const { MissingServerError } = require('./errors')
 
 
 class TransportService {
@@ -22,8 +23,19 @@ class TransportService {
         let url = new URL(this.urls.changeDate, this.urls.base)
         url.searchParams.append('date', httpParamDate)
 
+        // return fetch(url)
+        //     .then(response => response.json())
         return fetch(url)
-            .then(response => response.json())
+            .then(response => {
+                console.log(response.status)
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status)
+                }
+                return response.json()
+            })
+            .catch(err => {
+                throw new MissingServerError('server does not answer:' + err.message)
+            })
     }
 
     addNewTask(task) {
@@ -71,8 +83,6 @@ class TransportService {
 
         return fetch(url, reqInit)
     }
-
-
 }
 
 

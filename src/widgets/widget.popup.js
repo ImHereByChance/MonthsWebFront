@@ -7,22 +7,39 @@ class PopUpWindow extends Widget {
         super(options.parent)
         this.cssClass = options.cssClass
         this.onclose = options.onclose
-        this.Caption = new Widget(this, { innerText: translate(options.caption) })
-        this.SvgPicture = Widget.fromHTML(this, options.svgPicture)
-        this.ConformButton = new Widget(this, {
-            tagName: 'button',
-            innerText: translate('ok..'),
-            onclick: this.close.bind(this)
-        })
+        if (options.caption) {
+            this.Caption = new Widget(this, {
+                className: 'popup-caption',
+                innerText: options.caption
+            })
+        }
+        if (options.svgPicture) {
+            this.SvgPicture = Widget.fromHTML(this, options.svgPicture)
+        }
+        if (!options.irreversible) {
+            this.ConformButton = new Widget(this, {
+                tagName: 'button',
+                innerText: translate('ok'),
+                onclick: this.close.bind(this)
+            })
+        }
     }
 
     build() {
         super.build()
-        this.addCssClass('popup')
-        this.addCssClass(this.cssClass)
-        this.SvgPicture.build()
-        this.Caption.build()
-        this.ConformButton.build()
+        this.addCssClass('popup')       
+        if (this.cssClass) {
+            this.addCssClass(this.cssClass)
+        }     
+        if (this.SvgPicture) {
+            this.SvgPicture.build()
+        }      
+        if (this.Caption) {
+            this.Caption.build()     
+        }
+        if (this.ConformButton) {
+            this.ConformButton.build()
+        }    
         this.setDisabledForParent(true)
     }
 

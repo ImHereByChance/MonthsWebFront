@@ -1,4 +1,4 @@
-const {copyObject, toDateField, arraysEquals, DateFormat} = require('./tools')
+const {copyObject, toDateField, arraysEquals, DateFormat, translate } = require('./tools')
 
 
 class CacheService {
@@ -34,7 +34,10 @@ class CacheService {
                 .catch(err => {
                     console.log('%c Failed to receive data for changing ' + 
                                 `page date: ${this.pageDate}`, 'color: crimson')
-                    reject(err)
+                    
+                    reject(err => {
+                        throw err
+                    })
                 })
         })
     }

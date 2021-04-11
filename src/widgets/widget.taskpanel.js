@@ -53,7 +53,7 @@ class TaskPanel extends Widget {
         this.relatedDayButton = dayButton
         this.TaskList.update()
         this.DateLabel.element.innerText = DateFormat.dateLabel(dayButton.date)
-        
+
         if (!this.CreateTaskBt.isBuilded()) {
             this.CreateTaskBt.build()
         }
@@ -325,7 +325,7 @@ class TaskItem extends Widget {
         this.Title.element.innerText = newTaskFields.title
         this.Description.element.innerText = newTaskFields.description
     }
-    
+
     /**
      * To avoid conflicting states, in a task editing mode:
      * 1) disables the widgets for date changing and "auto-postpone until
@@ -372,11 +372,15 @@ class TaskItem extends Widget {
 
     makeChangesObserver() {
         this.editingWidgets.forEach(widget => {
-            // if (widget.hasOwnProperty('inputWidget')) {
-            //     widget.inputWidget.addEventListener.element('change', event => {
-            //         console.log('bip')
-            //     })
-            // }
+            if (widget.hasOwnProperty('inputWidget')) {
+                widget.inputWidget.element.addEventListener('change', event => {
+                    
+                    if (event.target.value != Widget.instanceList[event.target.id].defaultOptions.value) {
+                        this.SaveButton.show()
+                    }
+
+                })
+            }
         })
     }
 
