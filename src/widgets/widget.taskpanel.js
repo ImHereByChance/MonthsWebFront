@@ -269,6 +269,7 @@ class TaskItem extends Widget {
             }
         })
         this.makeConstraints()
+        this.makeChangesObserver()
     }
     /**
      * hides a task's title and description divs and shows the widgets
@@ -368,6 +369,18 @@ class TaskItem extends Widget {
             }
         })
     }
+
+    makeChangesObserver() {
+        this.editingWidgets.forEach(widget => {
+            // if (widget.hasOwnProperty('inputWidget')) {
+            //     widget.inputWidget.addEventListener.element('change', event => {
+            //         console.log('bip')
+            //     })
+            // }
+        })
+    }
+
+
     /**
      * takes the user's input from the task editing widgets and push it
      * on the server via cacheService.edit Task() method. If server succeed,
