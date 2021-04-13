@@ -1,5 +1,5 @@
 const { PopUpWindow } = require("./widgets/widget.popup")
-const { translate } = require("./tools")
+
 
 class MissingServerError extends Error {
     constructor(message) {
@@ -9,17 +9,56 @@ class MissingServerError extends Error {
         this.displayPopup()
     }
 
-
     displayPopup() {
         new PopUpWindow({
             parent: _mainContainer,
             cssClass: 'popup-defaultError',
             irreversible: true,
-            caption: translate('server is temporary unavailable..'),
+            caption: this.message,
             svgPicture: svgPaths.oopsError
         }).build()
     }
 
 }
 
-module.exports = { MissingServerError }
+
+class ServerError extends Error {
+    constructor(message, statusCode) {
+        super(message)
+        this.name = 'ServerError'
+        this.statusCode = statusCode
+
+        this.displayPopup()
+    }
+
+    displayPopup() {
+        new PopUpWindow({
+            parent: _mainContainer,
+            cssClass: 'popup-defaultError',
+            caption: this.message,
+            svgPicture: svgPaths.oopsError
+        }).build()
+    }
+}
+
+
+class ClientError extends Error {
+    constructor(message, statusCode) {
+        super(message)
+        this.name = 'ClientError'
+        this.statusCode = statusCode
+
+        this.displayPopup()
+    }
+
+    displayPopup() {
+        new PopUpWindow({
+            parent: _mainContainer,
+            cssClass: 'popup-defaultError',
+            caption: this.message,
+            svgPicture: svgPaths.oopsError
+        }).build()
+    }
+}
+
+module.exports = { MissingServerError, ServerError, ClientError }

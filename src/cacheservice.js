@@ -19,27 +19,21 @@ class CacheService {
         console.log('%c requesting data for changing page date: ' +
                     `${this.pageDate}`, 'color: cornflowerblue')
 
-        return new Promise ((resolve, reject) => {
-            this.transportService.getMonthPack(date)
-                .then(pack => {
-                    this.pageDate = date
-                    this.datesArray = DatesArray.from(pack.dates)
-                    this.tasksArray = TaskArray.from(pack.tasks)
+        return this.transportService.getMonthPack(date)
+            .then(pack => {
+                this.pageDate = date
+                this.datesArray = DatesArray.from(pack.dates)
+                this.tasksArray = TaskArray.from(pack.tasks)
 
-                    console.log('%c requested data successfully received ' + 
-                                'from the server', 'color: yellowgreen')
-                    console.log(this.tasksArray)
-                    resolve()
-                })
-                .catch(err => {
-                    console.log('%c Failed to receive data for changing ' + 
-                                `page date: ${this.pageDate}`, 'color: crimson')
-                    
-                    reject(err => {
-                        throw err
-                    })
-                })
-        })
+                console.log('%c requested data successfully received ' + 
+                            'from the server', 'color: yellowgreen')
+                console.log(this.tasksArray)
+            })
+            .catch(err => {
+                console.log('%c Failed to receive data for changing ' + 
+                            `page date: ${this.pageDate}`, 'color: crimson')
+                throw err
+            })
     }
 
     createTask(newTask) {
