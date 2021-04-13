@@ -16,7 +16,9 @@ const ruLocale = {
       'every year': 'ежегодно',
       'until completed': 'до выполнения',
       'no': 'нет',
-      'server is temporary unavailable..': 'сервер временно недоступен..'
+      'ok': 'ок',
+      'server is temporary unavailable..': 'сервер временно недоступен..',
+      'A task should have a title': 'У задачи должно быть название'
    }
 }
 

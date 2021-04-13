@@ -2,6 +2,7 @@ const { Widget } = require('./widget')
 const { IconButton24, Select } = require('./widget.common')
 const { svgPaths } = require('../svgpaths')
 const { DateFormat, translate } = require('../tools')
+const { PopUpWindow } = require('./widget.popup')
 
 
 class TaskPanel extends Widget {
@@ -393,6 +394,15 @@ class TaskItem extends Widget {
     saveInputValues() {
         let newTaskFields = this.takeInputValues()
         newTaskFields.id = this.taskObj.id
+        
+        if (!newTaskFields.title) {
+            new PopUpWindow({
+                parent: _mainContainer,
+                cssClass: 'popup-defaultError',
+                caption: translate('A task should have a title')
+            }).build()
+            return
+        }
 
         this.cacheService.editTask(newTaskFields)
             .then(() => {
@@ -464,6 +474,15 @@ class TaskAdder extends TaskItem {
     createNewTask() {
         let newTask = this.takeInputValues()
         newTask.id = this.taskObj.id
+
+        if (!newTask.title) {
+            new PopUpWindow({
+                parent: _mainContainer,
+                cssClass: 'popup-defaultError',
+                caption: translate('A task should have a title')
+            }).build()
+            return
+        }
 
         let thereIsInterval
         if (newTask.interval && newTask.interval != 'no') {
@@ -544,10 +563,11 @@ class TaskSettingsElement extends Widget {
                 tagName: 'input',
                 type: 'text',
                 name: 'new_title',
-                maxlength: "80",
-                minlength: "1",
                 value: this.taskObj.title
             })
+            inputWg.element.setAttribute('maxlength', 80)
+            inputWg.element.setAttribute('minlength', 1)
+            inputWg.element.setAttribute('required', true)
             return inputWg
         } else if (type === 'textarea') {
             return new Widget(this, {

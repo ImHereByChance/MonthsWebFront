@@ -1,5 +1,5 @@
 const CONFIG = require('./config')
-const { getCookie, translate, traverseNodeChildren } = require('./tools.js')
+const { getCookie, translate } = require('./tools.js')
 const { MissingServerError, ServerError, ClientError } = require('./errors')
 
 
