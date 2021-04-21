@@ -9,10 +9,11 @@ const { copyObject } = require('./tools')
 const { CacheService, TaskObject } = require('./cacheservice')
 const { TransportService } = require('./transportservice')
 const { svgPaths } = require('./svgpaths')
-const appConfig = require('./config')
+const appConfig = require('./config/config')
 
 
 // Entire app launch initializations.
+
 const _mainContainer = document.getElementById('_main-container')
 
 function launchApp(mainContainer, customConfig) {
@@ -35,11 +36,10 @@ function launchApp(mainContainer, customConfig) {
         })
         .catch(err => {
             console.error(err)
-            alert(err)
+            alert('sorry, the app is unavailable now')
             throw err
         })
         .then(() => {
-            // Make these accessible from browser dev tools console
             window.calendar = calendar
             window.taskPanel = taskPanel
         })

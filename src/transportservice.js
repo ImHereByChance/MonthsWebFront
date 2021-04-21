@@ -1,4 +1,4 @@
-const CONFIG = require('./config')
+const CONFIG = require('./config/config')
 const { getCookie, translate } = require('./tools.js')
 const { MissingServerError, ServerError, ClientError } = require('./errors')
 
