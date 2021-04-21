@@ -1,5 +1,4 @@
 const CONFIG = require('./config')
-const LOCALE = CONFIG.LOCALE
 
 
 /**
@@ -19,7 +18,7 @@ function copyObject(object) {
  */
 function arraysEquals(a, b) {
     return (a.length === b.length
-            && a.every((v, i) => v === b[i]))
+        && a.every((v, i) => v === b[i]))
 }
 
 /**
@@ -46,6 +45,10 @@ function traverseNodeChildren(element, handler, exclusions = []) {
 /*                        NETWORK                           
  ************************************************************/
 
+/**
+ * function from Django documentation to get cookies from the document
+ * @param  {string} name
+ */
 function getCookie(name) {
     let cookieValue = null
     if (document.cookie && document.cookie !== '') {
@@ -97,13 +100,13 @@ function resetTimezone(date) {
 }
 
 const DateFormat = {
-    monthLabel: (dateObj, locale=LOCALE) => {
+    monthLabel: (dateObj, locale = CONFIG.LOCALE) => {
         return new Intl.DateTimeFormat(locale.languageTag, {
             month: 'long',
             year: 'numeric'
         }).format(dateObj)
     },
-    dateLabel: (dateObj, locale=LOCALE) => {
+    dateLabel: (dateObj, locale = CONFIG.LOCALE) => {
         return new Intl.DateTimeFormat(locale.languageTag, {
             weekday: 'short',
             day: 'numeric',
@@ -138,7 +141,12 @@ const DateFormat = {
  * @param  {string} str
  * @param  {object} lang
  */
-function translate(str, locale=LOCALE) {
+function translate(str, locale = CONFIG.LOCALE) {
+    // no need to translate lines in the code already written in English
+    if (locale.languageTag.slice(0, 2).toLowerCase() === 'en') {
+        return str
+    }
+
     let translation = locale.lines[str]
     if (typeof translation === 'string') {
         return translation

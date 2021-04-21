@@ -1,4 +1,4 @@
-const path = require('path')  // nodejs tool to manage paths on the platform
+const path = require('path')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 

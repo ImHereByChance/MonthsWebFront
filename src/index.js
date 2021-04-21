@@ -1,35 +1,42 @@
 // uncomment to add styles in main.html header -->
 // import './styles/main.css'
-const {Widget} = require('./widgets/widget')
-const {DayButton, Calendar} = require('./widgets/widget.calendar')
-const {IconButton24} = require('./widgets/widget.common')
-const {TaskPanel} = require('./widgets/widget.taskpanel')
+const { Widget } = require('./widgets/widget')
+const { DayButton, Calendar } = require('./widgets/widget.calendar')
+const { IconButton24 } = require('./widgets/widget.common')
+const { TaskPanel } = require('./widgets/widget.taskpanel')
 const { PopUpWindow } = require('./widgets/widget.popup')
-const {copyObject} = require('./tools')
-const {CacheService, TaskObject} = require('./cacheservice')
-const {TransportService} = require('./transportservice')
-const {svgPaths} = require('./svgpaths')
+const { copyObject } = require('./tools')
+const { CacheService, TaskObject } = require('./cacheservice')
+const { TransportService } = require('./transportservice')
+const { svgPaths } = require('./svgpaths')
+const appConfig = require('./config')
 
 
 // Entire app launch initializations.
 const _mainContainer = document.getElementById('_main-container')
 
-function launch(mainContainer) {
+function launchApp(mainContainer, customConfig) {
+    
+    if (customConfig) {
+        Object.assign(appConfig, customConfig)
+    }
+
     const transportService = new TransportService()
     const cacheService = new CacheService(transportService)
     let calendar
     let taskPanel
-        
+
     cacheService.setPageDate(cacheService.today)
-        .then( () => {
+        .then(() => {
             calendar = new Calendar(mainContainer, cacheService)
             taskPanel = new TaskPanel(mainContainer, cacheService)
             calendar.build()
-            taskPanel.build()  
+            taskPanel.build()
         })
-        .catch( err => {
+        .catch(err => {
             console.error(err)
-            alert(err.errorTraceback)
+            alert(err)
+            throw err
         })
         .then(() => {
             // Make these accessible from browser dev tools console
@@ -37,6 +44,7 @@ function launch(mainContainer) {
             window.taskPanel = taskPanel
         })
 }
+
 
 function giveConsoleAccess() {
     window.Widget = Widget
@@ -51,8 +59,8 @@ function giveConsoleAccess() {
     window.svgPaths = svgPaths
     window.TaskPanel = TaskPanel
     window.PopUpWindow = PopUpWindow
+    window.launchApp = launchApp
+    window.appConfig = appConfig
 }
 
-
-launch(_mainContainer)
 giveConsoleAccess()
