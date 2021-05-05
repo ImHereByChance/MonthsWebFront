@@ -144,8 +144,12 @@ class Widget {
      * Sets this.element.style.display to the value, that was
      * given during initialization of this Widget instance
      */
-    show() {
-        this.element.style.display = this._defaultDisplayMode
+    show(mode) {
+        if (mode) {
+            this.element.style.display = mode
+        } else {
+            this.element.style.display = this._defaultDisplayMode
+        }
     }
 
     /**

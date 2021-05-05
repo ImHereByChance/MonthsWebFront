@@ -25,9 +25,19 @@ class Calendar extends Widget {
                 onclick: this.toPrevMonth.bind(this),
             }, svgPaths.pointLeft),
 
+
             this.MonthLabel = new Widget(this.Topbar, {
                 id: 'c-topbar__monthLabel',
-                innerText: DateFormat.monthLabel(this.date)
+                innerText: DateFormat.monthLabel(this.date),
+                onclick: this.switchLabelToPicker.bind(this),
+            }),
+            
+            this.MonthPicker = new Widget(this.Topbar, {
+                id: 'c-topbar__monthPicker',
+                tagName: 'input',
+                type: 'month',
+                value: this.date.toISOString().slice(0, 7),  // 'YYYY-MM'
+                onmouseout: this.switchPickerToLabel.bind(this)
             }),
 
             this.NextMonthBtn = new IconButton24(this.Topbar, {
@@ -46,7 +56,30 @@ class Calendar extends Widget {
     build() {
         super.build()
         this.childWidgets.forEach(ch => ch.build())
+        this.listenToMonthPicker()
         this.DayButtonArr.forEach(btn => btn.build())
+    }
+    
+    /**
+     * hide `this.MonthLabel` and show `this.MonthPicker`
+     */
+    switchLabelToPicker() {
+        this.MonthLabel.hide()
+        this.MonthPicker.show('block')
+    }
+
+    /**
+     * hide `this.MonthPicker` and show `this.MonthLabel` 
+     */
+    switchPickerToLabel() {
+        this.MonthLabel.show()
+        this.MonthPicker.hide()
+    }
+
+    listenToMonthPicker() {
+        this.MonthPicker.element.addEventListener('change', (event) => {
+            this.reqChangeDate(new Date(event.target.value))
+        } )
     }
 
     initDayButtons(frame, daysArr) {

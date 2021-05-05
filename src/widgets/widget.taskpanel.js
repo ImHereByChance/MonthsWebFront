@@ -413,6 +413,7 @@ class TaskItem extends Widget {
                 console.error(err)
             })
     }
+    
     /**
      * sends user input from checkDone checkbox (which indicates whether
      * a task marked as completed or not) to the server. If server

@@ -8,11 +8,10 @@ class TransportService {
         this.urls = serverURLs
     }
 
-    
     /**
      * A wrapper for the standard js fetch() function witch throws an
      * appropriate errors if response was finished undesirable or
-     * returns the response with a resolved Promise
+     * returns the response with a resolved Promise if everything is ok
      * @param  {} args - the same as for the standard js fetch()
      */
     fetchFromServer(...args) {
@@ -33,7 +32,7 @@ class TransportService {
      * Depending on response.status, throws an appropriate error or
      * returns a resolved Promise with the response object if
      * everything is ok. 
-     * @param  {} response
+     * @param  {response} response
      */
     _checkResponseForErrors(response) {
         if (!response.ok){
