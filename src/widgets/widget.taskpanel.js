@@ -265,6 +265,7 @@ class TaskItem extends Widget {
         this.editingWidgets.forEach(wg => {
             if (!wg.isBuilded()) {
                 wg.build()
+                this.bindKeysToInputWidget(wg)
             } else {
                 wg.show()
             }
@@ -385,7 +386,6 @@ class TaskItem extends Widget {
         })
     }
 
-
     /**
      * takes the user's input from the task editing widgets and push it
      * on the server via cacheService.edit Task() method. If server succeed,
@@ -412,6 +412,22 @@ class TaskItem extends Widget {
             .catch(err => {
                 console.error(err)
             })
+    }
+
+    /**
+     * bind the "ctrl + Enter" keyboard shortcut to an input widget so
+     * that users can save input using the keyboard
+     * @param  {Widget} widget
+     */
+    bindKeysToInputWidget(widget) {
+        if (widget.inputWidget) {
+            widget.inputWidget.element.addEventListener('keydown', event => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    this.saveInputValues()
+                        .then(this.switchToDefaultMode())
+                }
+            })
+        }
     }
     
     /**
@@ -503,7 +519,18 @@ class TaskAdder extends TaskItem {
             })
             .catch(err => {
                 console.error('catched in the end point:', err)
+            }) 
+    }
+
+    bindKeysToInputWidget(widget) {
+        if (widget.inputWidget) {
+            widget.inputWidget.element.addEventListener('keydown', event => {
+                if (event.ctrlKey && event.key === 'Enter') {
+                    this.createNewTask()
+                        .then(this.switchToDefaultMode())
+                }
             })
+        }
     }
 }
 
