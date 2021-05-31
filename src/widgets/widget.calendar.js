@@ -196,7 +196,10 @@ class DayButton extends Widget {
         this.updStatus()
         if (this.date.toDateString() === this.cacheService.today.toDateString()) {
             this.element.classList.add('--today')
+        } else {
+            this.element.classList.remove('--today')
         }
+
         if (this.date.getMonth() != this.cacheService.pageDate.getMonth()) {
             this.element.classList.add('--out-month')
         } else {
